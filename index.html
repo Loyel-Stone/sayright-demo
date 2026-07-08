@@ -240,6 +240,19 @@
     .settings-badge.active { background: var(--green-light); color: var(--green); }
     .settings-badge.soon { background: var(--orange-light); color: var(--orange); }
 
+    /* ── Why Section ── */
+    .why-section { margin-top: 32px; padding: 24px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .why-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .why-section p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
+
+    /* ── Audience Cards ── */
+    .audience-section { margin-top: 16px; }
+    .audience-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+    .audience-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+    .audience-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; }
+    .audience-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .audience-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
     /* ── Support & Roadmap ── */
     .support-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
     .support-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
@@ -292,6 +305,12 @@
 
       .scenario-bar { gap: 4px; }
       .scenario-btn { font-size: 11px; padding: 4px 10px; }
+
+      .why-section { padding: 18px 16px; }
+      .why-section h2 { font-size: 15px; }
+      .why-section p { font-size: 13px; }
+      .audience-grid { grid-template-columns: 1fr; }
+      .audience-section h2 { font-size: 15px; }
 
       .el-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px 16px; }
       .el-stat-card { padding: 10px 8px; }
@@ -468,6 +487,39 @@
       </div>
     </section>
 
+    <!-- ═══════════ WHY SAYRIGHT ═══════════ -->
+    <section class="why-section">
+      <h2>💡 为什么做 SayRight</h2>
+      <p>很多中文母语者不是不会英文，而是写出来容易带中文表达习惯。SayRight 想解决的不是背单词，而是把已经写出来的英文改得更自然、更礼貌、更符合场景。这是一个个人开发、免费演示、持续迭代的小工具。</p>
+    </section>
+
+    <!-- ═══════════ AUDIENCE ═══════════ -->
+    <section class="audience-section">
+      <h2>🎯 适合谁用</h2>
+      <div class="audience-grid">
+        <div class="audience-card">
+          <h3>🧑‍💼 求职者</h3>
+          <p>优化英文简历、项目经历、作品集介绍中的中式表达。</p>
+        </div>
+        <div class="audience-card">
+          <h3>👨‍💻 程序员</h3>
+          <p>优化 GitHub issue、README、commit 描述、英文技术沟通。</p>
+        </div>
+        <div class="audience-card">
+          <h3>🎓 学生</h3>
+          <p>优化作业表达、英文邮件、学术表达初稿。</p>
+        </div>
+        <div class="audience-card">
+          <h3>💼 职场人</h3>
+          <p>优化英文邮件、跨团队沟通、会议表达。</p>
+        </div>
+        <div class="audience-card">
+          <h3>🌏 出海/跨境从业者</h3>
+          <p>优化产品描述、客服回复、社交媒体英文内容。</p>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══════════ SECTION DIVIDER ═══════════ -->
     <div class="section-divider"><span>参考例句库</span></div>
 
@@ -562,6 +614,7 @@
         <div class="settings-card">
           <h3>公开演示版 <span class="settings-badge active">v1.0</span></h3>
           <p>当前 SayRight 以公开演示版形式发布。内置示例可直接体验纠错效果，无需任何配置。自定义英文需要真实 AI 模式（在 <code>.env</code> 中配置 <code>DEEPSEEK_API_KEY</code>）。未来桌面版将支持用户自带 API Key，无门槛使用完整功能。</p>
+          <p style="font-size:12px;color:var(--accent);">公开演示地址：https://loyel-stone.github.io/sayright-demo/</p>
         </div>
       </div>
     </div>
@@ -578,6 +631,7 @@
       <div class="support-actions">
         <button class="btn" id="supportBtn">💛 支持开发</button>
         <button class="btn" id="roadmapBtn">🗺️ 查看开发路线</button>
+        <button class="btn" id="copyIntroBtn">📣 复制项目介绍</button>
       </div>
 
       <div id="roadmapSection" style="display:none;">
@@ -1471,6 +1525,15 @@
         const visible = roadmapSection.style.display !== 'none';
         roadmapSection.style.display = visible ? 'none' : 'block';
         if (!visible) roadmapSection.scrollIntoView({ behavior: 'smooth' });
+      });
+      $('#copyIntroBtn').addEventListener('click', () => {
+        copyText(
+          '我做了一个免费演示工具 SayRight，专门把中式英文改成更自然、更符合场景的英文表达。\n\n' +
+          '它不是背单词软件，而是面向中文母语者的 AI 英文表达纠错工具。\n\n' +
+          '现在可以直接打开网页体验内置示例：\nhttps://loyel-stone.github.io/sayright-demo/\n\n' +
+          '自定义英文分析未来会支持桌面版和用户自带 API Key。',
+          '📣 已复制项目介绍'
+        );
       });
 
       // Scenario selector
