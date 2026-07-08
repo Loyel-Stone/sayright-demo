@@ -68,6 +68,18 @@
     .examples-section { margin-top: 18px; }
     .examples-toggle { font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
     .examples-toggle:hover { opacity: 0.8; }
+
+    .ex-filter-bar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+    .ex-search { flex: 1; min-width: 160px; padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius-pill); font-size: 13px; font-family: inherit; background: var(--card); color: var(--text); outline: none; transition: border-color 0.15s; }
+    .ex-search:focus { border-color: var(--accent); }
+    .ex-filter-pill { font-size: 11px; padding: 3px 10px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; white-space: nowrap; font-family: inherit; transition: all 0.1s ease; }
+    .ex-filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+    .ex-filter-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .ex-count { font-size: 11px; color: var(--text-secondary); white-space: nowrap; }
+    .ex-clear { font-size: 11px; color: var(--accent); cursor: pointer; white-space: nowrap; background: none; border: none; font-family: inherit; }
+    .ex-clear:hover { opacity: 0.7; }
+    .ex-empty { text-align: center; padding: 20px 0; color: var(--text-secondary); font-size: 13px; display: none; }
+
     .examples-grid { display: none; margin-top: 10px; }
     .examples-grid.open { display: block; }
     .example-group { margin-bottom: 12px; }
@@ -76,6 +88,8 @@
     .example-group-btns { display: flex; gap: 5px; flex-wrap: wrap; }
     .example-group-btn { font-size: 12px; padding: 4px 12px; border-radius: var(--radius-pill); border: 1px dashed var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
     .example-group-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .example-group-btn.hidden { display: none; }
+    .example-group.hidden { display: none; }
 
     /* ── Compare Card ── */
     .compare-card { background: linear-gradient(135deg, #fef2f2 0%, #f0fdf4 100%); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
@@ -318,6 +332,11 @@
       .scenario-bar { gap: 4px; }
       .scenario-btn { font-size: 11px; padding: 4px 10px; }
 
+      .ex-filter-bar { gap: 4px; }
+      .ex-search { font-size: 12px; padding: 6px 12px; min-width: 130px; }
+      .ex-filter-pill { font-size: 10px; padding: 3px 8px; }
+      .ex-count { font-size: 10px; }
+
       .why-section { padding: 18px 16px; }
       .why-section h2 { font-size: 15px; }
       .why-section p { font-size: 13px; }
@@ -404,7 +423,45 @@
       <!-- Chinglish Examples -->
       <div class="examples-section">
         <span class="examples-toggle" id="examplesToggle">📋 常见中式英文示例（已收录 50 条）▾</span>
-        <p style="font-size:11px;color:#adb5bd;margin:4px 0 10px 0;">覆盖中式表达、介词错误、语气生硬、邮件不礼貌、简历太弱、技术表达不清楚等高频问题</p>
+        <p style="font-size:11px;color:#adb5bd;margin:4px 0 6px 0;">覆盖中式表达、介词错误、语气生硬、邮件不礼貌、简历太弱、技术表达不清楚等高频问题</p>
+
+        <!-- Example Search & Filters -->
+        <div class="ex-filter-bar">
+          <input class="ex-search" id="exSearch" placeholder="搜索示例，比如 email、reply、resume、邮件、简历…" />
+          <span class="ex-count" id="exCount">53 / 53 条</span>
+          <button class="ex-clear" id="exClear">清空筛选</button>
+        </div>
+        <div class="ex-filter-bar" id="exSceneFilter">
+          <button class="ex-filter-pill active" data-ex-scene="all">全部场景</button>
+          <button class="ex-filter-pill" data-ex-scene="general">通用</button>
+          <button class="ex-filter-pill" data-ex-scene="daily_chat">日常聊天</button>
+          <button class="ex-filter-pill" data-ex-scene="work_email">工作邮件</button>
+          <button class="ex-filter-pill" data-ex-scene="workplace">职场沟通</button>
+          <button class="ex-filter-pill" data-ex-scene="academic">学术</button>
+          <button class="ex-filter-pill" data-ex-scene="resume">简历</button>
+          <button class="ex-filter-pill" data-ex-scene="social_media">社交媒体</button>
+          <button class="ex-filter-pill" data-ex-scene="github_tech">GitHub</button>
+          <button class="ex-filter-pill" data-ex-scene="cross_border_cs">跨境客服</button>
+          <button class="ex-filter-pill" data-ex-scene="product_desc">产品</button>
+        </div>
+        <div class="ex-filter-bar" id="exTagFilter">
+          <button class="ex-filter-pill active" data-ex-tag="all">全部标签</button>
+          <button class="ex-filter-pill" data-ex-tag="中式表达">中式表达</button>
+          <button class="ex-filter-pill" data-ex-tag="语法错误">语法错误</button>
+          <button class="ex-filter-pill" data-ex-tag="介词错误">介词错误</button>
+          <button class="ex-filter-pill" data-ex-tag="搭配不自然">搭配不自然</button>
+          <button class="ex-filter-pill" data-ex-tag="语气生硬">语气生硬</button>
+          <button class="ex-filter-pill" data-ex-tag="邮件不礼貌">邮件不礼貌</button>
+          <button class="ex-filter-pill" data-ex-tag="表达冗余">表达冗余</button>
+          <button class="ex-filter-pill" data-ex-tag="简历太弱">简历太弱</button>
+          <button class="ex-filter-pill" data-ex-tag="学术不正式">学术不正式</button>
+          <button class="ex-filter-pill" data-ex-tag="技术不清楚">技术不清楚</button>
+          <button class="ex-filter-pill" data-ex-tag="客服生硬">客服生硬</button>
+          <button class="ex-filter-pill" data-ex-tag="文案不自然">文案不自然</button>
+        </div>
+
+        <div class="ex-empty" id="exEmpty">没有找到匹配的示例。可以换个关键词，或点击「清空筛选」。</div>
+
         <div class="examples-grid" id="examplesGrid">
           <div class="example-group">
             <div class="example-group-title">通用表达 · 5 条</div>
@@ -815,6 +872,73 @@
         cross_border_cs: '跨境客服',
         product_desc:    '产品描述',
       };
+
+      // ═══════════ EXAMPLE TAGS (for filtering) ═══════════
+      // Maps each example text to its error tags. Used by example search/filter.
+      const EXAMPLE_TAGS = {};
+      const _exInit = () => {
+        document.querySelectorAll('.example-group-btn').forEach(btn => {
+          const text = btn.dataset.text;
+          if (!EXAMPLE_TAGS[text]) {
+            // Extract tag from the inner span
+            const span = btn.querySelector('span');
+            const tags = span ? [span.textContent.trim()] : [];
+            EXAMPLE_TAGS[text] = tags;
+          }
+        });
+        // Augment with fuller tag lists matching DEMO_RESULTS
+        const _extra = {
+          "I very like this app.": ["中式表达", "动词搭配"],
+          "I think this is not very good.": ["词序问题", "中式表达"],
+          "I am boring today.": ["中式表达", "语法错误"],
+          "Long time no see you.": ["语法错误"],
+          "I want to go to home.": ["介词错误", "中式表达"],
+          "I want to ask about the meeting.": ["语气生硬", "邮件不礼貌"],
+          "Please reply me as soon as possible.": ["介词错误", "邮件不礼貌"],
+          "I have a question want to ask you.": ["语法错误", "中式表达"],
+          "I wait your reply.": ["介词错误", "邮件不礼貌"],
+          "Can you give me a feedback?": ["语法错误", "邮件不礼貌"],
+          "Sorry to bother you, but I want to ask one thing.": ["表达冗余", "邮件不礼貌"],
+          "Can you help me to see this?": ["中式表达", "搭配不自然"],
+          "I will finish it until tomorrow.": ["介词错误", "中式表达"],
+          "I already finished this work.": ["搭配不自然", "语气生硬"],
+          "This problem is very difficult to solve it.": ["表达冗余", "语法错误"],
+          "We need to discuss about this.": ["介词错误", "中式表达"],
+          "This paper talks about many things.": ["学术不正式"],
+          "The result is very good.": ["学术不正式"],
+          "I want to research this problem.": ["学术不正式", "搭配不自然"],
+          "There are many researches about this topic.": ["语法错误", "学术不正式"],
+          "This essay will say why this is important.": ["学术不正式"],
+          "I did many works in this company.": ["简历太弱", "语法错误"],
+          "I am responsible for many things.": ["简历太弱"],
+          "I helped the company get better.": ["简历太弱", "中式表达"],
+          "I learned a lot from this job.": ["简历太弱"],
+          "I made the sales become higher.": ["中式表达", "简历太弱"],
+          "I have strong learning ability.": ["中式表达", "简历太弱"],
+          "This thing makes me very happy.": ["中式表达", "搭配不自然"],
+          "I want to share my feeling.": ["语法错误", "语气生硬"],
+          "This app is very useful for me.": ["介词错误", "搭配不自然"],
+          "Today I meet a very good thing.": ["中式表达", "搭配不自然"],
+          "I feel this is so interesting.": ["搭配不自然", "语气生硬"],
+          "This code has some problem.": ["技术不清楚", "语法错误"],
+          "I don't know why it can't work.": ["技术不清楚"],
+          "Please help me see this bug.": ["中式表达", "技术不清楚"],
+          "I fixed this problem by change the function.": ["语法错误", "技术不清楚"],
+          "This PR add a new feature.": ["语法错误", "技术不清楚"],
+          "Dear customer, we already send your package.": ["语法错误", "客服生硬"],
+          "Please wait patiently.": ["客服生硬", "语气生硬"],
+          "We are sorry for make you trouble.": ["语法错误", "客服生硬"],
+          "If you have problem, contact us.": ["语法错误", "客服生硬"],
+          "We will give you a solution soon.": ["搭配不自然", "客服生硬"],
+          "This product is very good to use.": ["文案不自然"],
+          "It can make your life more convenient.": ["文案不自然", "表达冗余"],
+          "Our product has many functions.": ["文案不自然"],
+          "This bag is high quality and beautiful.": ["搭配不自然", "文案不自然"],
+          "It is suitable for many people to use.": ["表达冗余", "文案不自然"],
+        };
+        Object.entries(_extra).forEach(([k, v]) => { EXAMPLE_TAGS[k] = v; });
+      };
+      setTimeout(_exInit, 100); // run after DOM is ready
 
       // ═══════════ DEMO RESULTS ═══════════
       // Preset corrections for 18 common Chinglish examples so the tool
@@ -2124,12 +2248,130 @@
       // Hero
       heroFixBtn.addEventListener('click', runFix);
       $('#heroReviewBtn').addEventListener('click', scrollToReview);
+      // ═══════════ EXAMPLE FILTER STATE ═══════════
+      let exSearchQuery = '';
+      let exSceneFilterVal = 'all';
+      let exTagFilterVal = 'all';
+
+      function filterExamples() {
+        const buttons = document.querySelectorAll('.example-group-btn');
+        const groups = document.querySelectorAll('.example-group');
+        let visible = 0;
+        const total = buttons.length;
+
+        groups.forEach(g => g.classList.add('hidden'));
+        buttons.forEach(btn => {
+          const text = btn.dataset.text.toLowerCase();
+          const scene = btn.dataset.scene;
+          const tags = EXAMPLE_TAGS[btn.dataset.text] || [];
+          const sceneName = (SCENARIOS[scene] || '').toLowerCase();
+
+          // Search match
+          let searchMatch = true;
+          if (exSearchQuery) {
+            const q = exSearchQuery.toLowerCase();
+            searchMatch = text.includes(q) || sceneName.includes(q) || tags.some(t => t.toLowerCase().includes(q) || q.includes(t.toLowerCase()));
+          }
+
+          // Scene match
+          const sceneMatch = exSceneFilterVal === 'all' || scene === exSceneFilterVal;
+
+          // Tag match (fuzzy: "简历太弱" matches "简历表达太弱", etc.)
+          let tagMatch = true;
+          if (exTagFilterVal !== 'all') {
+            tagMatch = tags.some(t => {
+              const tLower = t.toLowerCase();
+              const fLower = exTagFilterVal.toLowerCase();
+              return tLower.includes(fLower) || fLower.includes(tLower);
+            });
+          }
+
+          if (searchMatch && sceneMatch && tagMatch) {
+            btn.classList.remove('hidden');
+            // Show parent group
+            const group = btn.closest('.example-group');
+            if (group) group.classList.remove('hidden');
+            visible++;
+          } else {
+            btn.classList.add('hidden');
+          }
+        });
+
+        // Update count
+        $('#exCount').textContent = `${visible} / ${total} 条`;
+        // Show/hide empty message
+        $('#exEmpty').style.display = visible === 0 ? 'block' : 'none';
+
+        // Update group title counts
+        groups.forEach(g => {
+          if (!g.classList.contains('hidden')) {
+            const visibleBtns = g.querySelectorAll('.example-group-btn:not(.hidden)').length;
+            const title = g.querySelector('.example-group-title');
+            if (title && title.dataset.originalTitle === undefined) {
+              title.dataset.originalTitle = title.textContent;
+            }
+          }
+        });
+      }
+
+      function resetExampleFilters() {
+        exSearchQuery = '';
+        exSceneFilterVal = 'all';
+        exTagFilterVal = 'all';
+        $('#exSearch').value = '';
+        $$('#exSceneFilter .ex-filter-pill').forEach(p => p.classList.toggle('active', p.dataset.exScene === 'all'));
+        $$('#exTagFilter .ex-filter-pill').forEach(p => p.classList.toggle('active', p.dataset.exTag === 'all'));
+        filterExamples();
+      }
+
+      function ensureExamplesOpen() {
+        const grid = $('#examplesGrid');
+        if (!grid.classList.contains('open')) {
+          grid.classList.add('open');
+          $('#examplesToggle').textContent = '📋 常见中式英文示例（已收录 50 条）▴';
+        }
+      }
+
       // Example toggle
       $('#examplesToggle').addEventListener('click', () => {
         const grid = $('#examplesGrid');
         const open = grid.classList.toggle('open');
-        $('#examplesToggle').textContent = open ? '📋 常见中式英文示例 ▴' : '📋 常见中式英文示例 ▾';
+        $('#examplesToggle').textContent = open ? '📋 常见中式英文示例（已收录 50 条）▴' : '📋 常见中式英文示例（已收录 50 条）▾';
       });
+
+      // Example search
+      let exSearchTimer;
+      $('#exSearch').addEventListener('input', () => {
+        clearTimeout(exSearchTimer);
+        exSearchTimer = setTimeout(() => {
+          exSearchQuery = $('#exSearch').value;
+          ensureExamplesOpen();
+          filterExamples();
+        }, 200);
+      });
+
+      // Scene filter
+      $('#exSceneFilter').addEventListener('click', (e) => {
+        const pill = e.target.closest('.ex-filter-pill');
+        if (!pill) return;
+        exSceneFilterVal = pill.dataset.exScene;
+        $$('#exSceneFilter .ex-filter-pill').forEach(p => p.classList.toggle('active', p.dataset.exScene === exSceneFilterVal));
+        ensureExamplesOpen();
+        filterExamples();
+      });
+
+      // Tag filter
+      $('#exTagFilter').addEventListener('click', (e) => {
+        const pill = e.target.closest('.ex-filter-pill');
+        if (!pill) return;
+        exTagFilterVal = pill.dataset.exTag;
+        $$('#exTagFilter .ex-filter-pill').forEach(p => p.classList.toggle('active', p.dataset.exTag === exTagFilterVal));
+        ensureExamplesOpen();
+        filterExamples();
+      });
+
+      // Clear
+      $('#exClear').addEventListener('click', resetExampleFilters);
 
       // Scene-aware example buttons
       document.querySelectorAll('.example-group-btn').forEach(btn => {
