@@ -160,6 +160,11 @@
     .el-profile-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s ease; }
     .el-profile-count { font-size: 12px; font-weight: 700; color: var(--text-secondary); min-width: 24px; text-align: right; }
 
+    .el-data-mgmt { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .el-data-mgmt .el-data-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; white-space: nowrap; }
+    .el-summary { padding: 10px 24px; border-bottom: 1px solid var(--border); background: var(--accent-light); }
+    .el-summary-text { font-size: 12px; color: var(--accent); line-height: 1.6; }
+
     .el-filter-bar { display: flex; gap: 6px; padding: 12px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
     .el-filter-sep { font-size: 12px; color: #adb5bd; margin: 0 4px; }
 
@@ -579,7 +584,6 @@
         <h2>📚 我的错误库</h2>
         <span class="el-count" id="elCount">0 条</span>
         <span class="spacer"></span>
-        <button class="btn-sm danger" id="elClearBtn">清空错误库</button>
       </div>
 
       <div class="el-stats-grid" id="elStatsGrid">
@@ -593,6 +597,21 @@
         <div class="el-profile-title">错误画像</div>
         <div class="el-profile-list" id="elProfileList"></div>
       </div>
+
+      <!-- Summary -->
+      <div class="el-summary" id="elSummary" style="display:none;">
+        <div class="el-summary-text" id="elSummaryText"></div>
+      </div>
+
+      <!-- Data management -->
+      <div class="el-data-mgmt">
+        <span class="el-data-label">数据管理</span>
+        <button class="btn-sm" id="elExportJSONBtn">导出 JSON</button>
+        <button class="btn-sm" id="elExportReportBtn">导出学习报告</button>
+        <button class="btn-sm" id="elImportBtn">导入 JSON</button>
+        <button class="btn-sm danger" id="elClearBtn">清空错误库</button>
+      </div>
+      <input type="file" id="elImportFile" accept=".json" style="display:none;" />
 
       <!-- Filters: mastery + scenario -->
       <div class="el-filter-bar" id="elFilterBar">
@@ -1762,6 +1781,7 @@
         elCount.textContent = `${filtered.length} 条`;
         renderElStats();
         renderElProfile();
+        renderElSummary();
 
         if (!lib.length) {
           elList.innerHTML = '<div class="el-empty">你还没有保存错误。先纠正一句英文，再把它加入错误库。</div>';
@@ -1804,12 +1824,102 @@
       }
 
       function clearErrorLib() {
-        if (!confirm('确定要清空所有错误库记录吗？此操作不可撤销。')) return;
+        if (!confirm('确定要清空全部错误库吗？此操作不可恢复，建议先导出备份。')) return;
         saveErrorLib([]);
         elFilter = 'all'; elSceneFilter = 'all';
         updateElFilterUI();
         renderErrorLib();
-        showToast('已清空错误库');
+        showToast('错误库已清空');
+      }
+
+      function renderElSummary() {
+        const lib = loadErrorLib();
+        if (!lib.length) { $('#elSummary').style.display = 'none'; return; }
+        // Most common tag
+        const tagCounts = {};
+        lib.forEach(e => (e.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+        let topTag = '', topCount = 0;
+        for (const [tag, n] of Object.entries(tagCounts)) { if (n > topCount) { topTag = tag; topCount = n; } }
+        // Most common scenario
+        const sceneCounts = {};
+        lib.forEach(e => { const s = e.scenarioLabel || '通用'; sceneCounts[s] = (sceneCounts[s] || 0) + 1; });
+        let topScene = '', topSceneCount = 0;
+        for (const [s, n] of Object.entries(sceneCounts)) { if (n > topSceneCount) { topScene = s; topSceneCount = n; } }
+
+        if (topTag && topScene) {
+          $('#elSummary').style.display = 'block';
+          $('#elSummaryText').textContent = `你目前最常见的问题是：${topTag}。建议优先复习${topScene}场景的句子。`;
+        }
+      }
+
+      function exportErrorLibJSON() {
+        const lib = loadErrorLib();
+        if (!lib.length) { showToast('错误库为空，暂无可导出的内容。'); return; }
+        const data = { app: 'SayRight', version: '1.5', exportedAt: new Date().toISOString(), count: lib.length, items: lib };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `sayright-error-library-${todayKey()}.json`; a.click();
+        URL.revokeObjectURL(url);
+        showToast(`已导出 ${lib.length} 条错误记录`);
+      }
+
+      function exportErrorLibReport() {
+        const lib = loadErrorLib();
+        if (!lib.length) { showToast('错误库为空，暂无可导出的内容。'); return; }
+
+        const mastered = lib.filter(e => e.mastered).length;
+        const pending = lib.length - mastered;
+        const tagCounts = {};
+        lib.forEach(e => (e.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+        const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const sceneCounts = {};
+        lib.forEach(e => { const s = e.scenarioLabel || '通用'; sceneCounts[s] = (sceneCounts[s] || 0) + 1; });
+        const topScene = Object.entries(sceneCounts).sort((a, b) => b[1] - a[1])[0];
+        const pendingItems = lib.filter(e => !e.mastered).slice(0, 10);
+        const masteredItems = lib.filter(e => e.mastered).slice(0, 10);
+
+        const md = `# SayRight 学习报告\n\n生成时间：${new Date().toISOString().slice(0, 19).replace('T', ' ')}\n\n## 总览\n- 总错误数：${lib.length}\n- 已掌握：${mastered}\n- 待复习：${pending}\n- 最常见标签：${topTags.length ? topTags[0][0] : '-'}\n- 最常见场景：${topScene ? topScene[0] : '-'}\n\n## 高频错误标签\n${topTags.map(([t, n]) => `- ${t}：${n}`).join('\n') || '- 暂无数据'}\n\n## 场景分布\n${Object.entries(sceneCounts).sort((a, b) => b[1] - a[1]).map(([s, n]) => `- ${s}：${n}`).join('\n')}\n\n## 待复习句子\n${pendingItems.length ? pendingItems.map(e => `- 原句：${e.original}\n  - 修正：${e.corrected}\n  - 场景最佳：${e.scenarioVersion || e.natural}\n  - 标签：${(e.tags || []).join('、') || '-'}\n  - 复习次数：${e.reviewCount}`).join('\n\n') : '- 暂无待复习句子'}\n\n## 已掌握句子\n${masteredItems.length ? masteredItems.map(e => `- 原句：${e.original}\n  - 修正：${e.corrected}\n  - 标签：${(e.tags || []).join('、') || '-'}`).join('\n\n') : '- 暂无已掌握句子'}\n\n## 说明\n本报告由 SayRight 根据浏览器本地错误库生成，不会自动上传用户内容。\n`;
+
+        const blob = new Blob([md], { type: 'text/markdown' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = `sayright-learning-report-${todayKey()}.md`; a.click();
+        URL.revokeObjectURL(url);
+        showToast('学习报告已导出');
+      }
+
+      function importErrorLibJSON(file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            const raw = JSON.parse(e.target.result);
+            let items;
+            if (raw && raw.items && Array.isArray(raw.items)) { items = raw.items; }
+            else if (Array.isArray(raw)) { items = raw; }
+            else { showToast('文件格式不正确。'); return; }
+
+            if (!items.length) { showToast('未找到可导入的错误记录。'); return; }
+
+            const lib = loadErrorLib();
+            const existingIds = new Set(lib.map(e => e.id));
+            let added = 0, skipped = 0;
+            items.forEach(entry => {
+              const migrated = migrateEntry(entry, 0);
+              // Dedup: by id, or by original+corrected+createdAt
+              let dupKey = migrated.id;
+              if (!dupKey || dupKey === migrated.original) {
+                dupKey = `${migrated.original}||${migrated.corrected}||${migrated.createdAt}`;
+              }
+              if (existingIds.has(migrated.id) || existingIds.has(dupKey)) { skipped++; return; }
+              existingIds.add(migrated.id || dupKey);
+              lib.push(migrated);
+              added++;
+            });
+            saveErrorLib(lib);
+            renderErrorLib();
+            showToast(`已导入 ${added} 条，跳过 ${skipped} 条重复记录`);
+          } catch (_) { showToast('文件格式不正确。'); }
+        };
+        reader.readAsText(file);
       }
 
       function scrollToReview() {
@@ -2401,6 +2511,13 @@
         renderErrorLib();
       });
 
+      // Error lib data management
+      $('#elExportJSONBtn').addEventListener('click', exportErrorLibJSON);
+      $('#elExportReportBtn').addEventListener('click', exportErrorLibReport);
+      $('#elImportBtn').addEventListener('click', () => $('#elImportFile').click());
+      $('#elImportFile').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) { importErrorLibJSON(e.target.files[0]); e.target.value = ''; }
+      });
       $('#elClearBtn').addEventListener('click', clearErrorLib);
 
       $('#levelBar').addEventListener('click', (e) => { const p = e.target.closest('.pill'); if (p) setLevel(p.dataset.level); });
