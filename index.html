@@ -253,6 +253,18 @@
     .audience-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
     .audience-card p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
 
+    /* ── Feedback Section ── */
+    .feedback-section { margin-top: 24px; padding: 24px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .feedback-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 6px; }
+    .feedback-section .feedback-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; line-height: 1.6; }
+    .feedback-field { margin-bottom: 14px; }
+    .feedback-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+    .feedback-field input, .feedback-field select, .feedback-field textarea { width: 100%; padding: 9px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 14px; font-family: inherit; background: var(--card); color: var(--text); outline: none; transition: border-color 0.15s; }
+    .feedback-field input:focus, .feedback-field select:focus, .feedback-field textarea:focus { border-color: var(--accent); }
+    .feedback-field textarea { resize: vertical; min-height: 60px; }
+    .feedback-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 18px; }
+    .feedback-notice { margin-top: 14px; font-size: 11px; color: #adb5bd; line-height: 1.6; }
+
     /* ── Support & Roadmap ── */
     .support-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
     .support-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
@@ -311,6 +323,9 @@
       .why-section p { font-size: 13px; }
       .audience-grid { grid-template-columns: 1fr; }
       .audience-section h2 { font-size: 15px; }
+
+      .feedback-section { padding: 18px 16px; }
+      .feedback-section h2 { font-size: 15px; }
 
       .el-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px 16px; }
       .el-stat-card { padding: 10px 8px; }
@@ -518,6 +533,60 @@
           <p>优化产品描述、客服回复、社交媒体英文内容。</p>
         </div>
       </div>
+    </section>
+
+    <!-- ═══════════ FEEDBACK ═══════════ -->
+    <section class="feedback-section">
+      <h2>📮 提交你的中式英文</h2>
+      <p class="feedback-sub">如果你经常写出某种不自然的英文，可以把它整理成反馈模板发给我。后续我会把高频句子加入示例库。</p>
+
+      <div class="feedback-field">
+        <label for="fbOriginal">你写出来的英文</label>
+        <input type="text" id="fbOriginal" placeholder="I very like this product." />
+      </div>
+
+      <div class="feedback-field">
+        <label for="fbScenario">你想用在哪个场景</label>
+        <select id="fbScenario">
+          <option value="通用">通用</option>
+          <option value="日常聊天">日常聊天</option>
+          <option value="工作邮件">工作邮件</option>
+          <option value="职场沟通">职场沟通</option>
+          <option value="学术表达">学术表达</option>
+          <option value="简历优化">简历优化</option>
+          <option value="社交媒体">社交媒体</option>
+          <option value="GitHub / 技术沟通">GitHub / 技术沟通</option>
+          <option value="跨境客服">跨境客服</option>
+          <option value="产品描述">产品描述</option>
+        </select>
+      </div>
+
+      <div class="feedback-field">
+        <label for="fbStyle">你希望它变成什么风格</label>
+        <select id="fbStyle">
+          <option value="更自然">更自然</option>
+          <option value="更礼貌">更礼貌</option>
+          <option value="更专业">更专业</option>
+          <option value="更简洁">更简洁</option>
+          <option value="更适合简历">更适合简历</option>
+          <option value="更适合邮件">更适合邮件</option>
+          <option value="更适合社交媒体">更适合社交媒体</option>
+        </select>
+      </div>
+
+      <div class="feedback-field">
+        <label for="fbNotes">补充说明（可选）</label>
+        <textarea id="fbNotes" placeholder="比如：这是我想写给客户的邮件，想礼貌一点。"></textarea>
+      </div>
+
+      <div class="feedback-actions">
+        <button class="btn" id="fbCopyBtn">📋 复制反馈模板</button>
+        <button class="btn" id="fbCopyGithubBtn">🐙 复制 GitHub Issue 文案</button>
+      </div>
+
+      <p class="feedback-notice">
+        🔒 当前版本不会自动上传你的内容。点击按钮只会复制模板，你可以自行决定是否发给作者、评论区或 GitHub Issue。
+      </p>
     </section>
 
     <!-- ═══════════ SECTION DIVIDER ═══════════ -->
@@ -1526,6 +1595,50 @@
         roadmapSection.style.display = visible ? 'none' : 'block';
         if (!visible) roadmapSection.scrollIntoView({ behavior: 'smooth' });
       });
+      // Feedback form
+      const fbOriginal = $('#fbOriginal');
+      const fbScenario = $('#fbScenario');
+      const fbStyle    = $('#fbStyle');
+      const fbNotes    = $('#fbNotes');
+
+      $('#fbCopyBtn').addEventListener('click', () => {
+        const orig = fbOriginal.value.trim();
+        if (!orig) { showToast('请先输入一句英文。'); return; }
+        const notes = fbNotes.value.trim() || '无';
+        copyText(
+          '【SayRight 句子反馈】\n\n' +
+          `我写的英文：\n${orig}\n\n` +
+          `使用场景：\n${fbScenario.value}\n\n` +
+          `期望风格：\n${fbStyle.value}\n\n` +
+          `补充说明：\n${notes}\n\n` +
+          '我希望 SayRight 后续可以支持这类表达。',
+          '反馈模板已复制，可以发给作者或贴到评论区。'
+        );
+      });
+
+      $('#fbCopyGithubBtn').addEventListener('click', () => {
+        const orig = fbOriginal.value.trim();
+        if (!orig) { showToast('请先输入一句英文。'); return; }
+        const notes = fbNotes.value.trim() || 'None';
+        const title = orig.length > 40 ? orig.slice(0, 40) + '...' : orig;
+        copyText(
+          'Title:\n' +
+          `Add example: ${title}\n\n` +
+          'Body:\n' +
+          '## Original sentence\n' +
+          `${orig}\n\n` +
+          '## Scenario\n' +
+          `${fbScenario.value}\n\n` +
+          '## Desired style\n' +
+          `${fbStyle.value}\n\n` +
+          '## Notes\n' +
+          `${notes}\n\n` +
+          '## Why this matters\n' +
+          'This is a common expression issue for Chinese native speakers.',
+          'GitHub Issue 文案已复制，可以贴到 Issue 中。'
+        );
+      });
+
       $('#copyIntroBtn').addEventListener('click', () => {
         copyText(
           '我做了一个免费演示工具 SayRight，专门把中式英文改成更自然、更符合场景的英文表达。\n\n' +
