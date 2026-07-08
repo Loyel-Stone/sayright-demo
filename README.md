@@ -28,6 +28,7 @@
 
 **AI 纠错**
 - **两种运行模式**：真实 AI 模式（需 `npm start` + API Key）和演示模式（无需后端，点击内置示例即可体验预设结果）
+- **自带 API Key**：本地运行版支持在设置中填写自己的 DeepSeek API Key，Key 仅保存在浏览器 localStorage，不上传
 - 提供更自然的母语表达、中文解释和替代表达
 - **场景化改写**：支持通用、日常聊天、工作邮件、职场沟通、学术表达、简历优化、社交媒体 7 种场景
 - **常见中式英文示例**：53 条按 10 个场景分组的典型中式英文，每条带错误标签；支持搜索、按场景筛选、按错误标签筛选，结果实时计数
@@ -96,23 +97,25 @@ python3 -m http.server 8000
 
 ### 真实 AI 模式（完整功能）
 
-任意英文句子都可纠错，需要 DeepSeek API Key。
+任意英文句子都可纠错。正式用户路径：
 
 ```bash
-# 1. 安装依赖
 npm install
-
-# 2. 创建 .env（不要提交到 Git）
-echo "DEEPSEEK_API_KEY=你的Key" > .env
-
-# 3. 启动
 npm start
-
-# 4. 打开 http://localhost:3000
+# 打开 http://localhost:3000 → ⚙️ 设置 → 自带 DeepSeek API Key → 粘贴你的 Key → 保存
 ```
 
-> `.env` 已在 `.gitignore` 中，不会被提交到 Git。
-> 纯静态托管（GitHub Pages 等）无法使用真实 AI 模式，只能使用演示模式。
+Key 保存在浏览器 localStorage，仅发送给本地后端（localhost），不上传。
+
+**.env 是开发者调试 fallback，普通用户不需要：**
+
+```bash
+echo "DEEPSEEK_API_KEY=你的Key" > .env  # 可选，仅开发者调试用
+```
+
+> **优先级**：用户设置界面保存的 Key > `.env` 中的 Key > 演示模式。
+> `.env` 已在 `.gitignore` 中，不要提交到 Git。
+> 纯静态托管（GitHub Pages 等）无法使用真实 AI 模式。
 
 ## 数据来源
 

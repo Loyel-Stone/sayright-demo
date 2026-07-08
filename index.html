@@ -269,6 +269,12 @@
     .settings-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-pill); }
     .settings-badge.active { background: var(--green-light); color: var(--green); }
     .settings-badge.soon { background: var(--orange-light); color: var(--orange); }
+    .settings-badge.ok { background: var(--green-light); color: var(--green); }
+    .settings-badge.error { background: var(--red-light); color: var(--red); }
+    .settings-key-row { display: flex; gap: 6px; margin-top: 8px; align-items: center; }
+    .settings-key-input { flex: 1; padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 13px; font-family: monospace; background: var(--card); color: var(--text); outline: none; }
+    .settings-key-input:focus { border-color: var(--accent); }
+    .settings-key-status { font-size: 12px; margin-top: 6px; }
 
     /* ── Why Section ── */
     .why-section { margin-top: 32px; padding: 24px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
@@ -941,9 +947,21 @@
           <p style="font-size:12px;color:#adb5bd;">如果你自己部署此项目，需要在项目根目录创建 <code>.env</code> 文件并填写 <code>DEEPSEEK_API_KEY=你的Key</code>。</p>
         </div>
         <div class="settings-card">
-          <h3>自带 API Key <span class="settings-badge soon">待开发</span></h3>
-          <p>桌面版和浏览器插件版将支持用户填写自己的 DeepSeek API Key，无需依赖运营方承担 AI 成本。你的 Key 只保存在本地设备，不上传到任何服务器。</p>
-          <p style="font-size:12px;color:#adb5bd;">此功能预计在桌面端 App v1.0 中提供。网页版出于安全考虑，暂不支持在浏览器中保存真实 API Key。</p>
+          <h3>自带 DeepSeek API Key <span class="settings-badge" id="apiKeyBadge">演示模式</span></h3>
+          <p>本地运行版支持使用你自己的 DeepSeek API Key。Key 保存在当前浏览器 localStorage 中，仅发送给本地后端（<code>localhost</code>），不上传到任何云端服务器。</p>
+          <p style="font-size:11px;color:#adb5bd;margin:0 0 6px;"><code>.env</code> 中的 <code>DEEPSEEK_API_KEY</code> 仅为开发者本地调试 fallback，普通用户不需要创建 <code>.env</code> 文件。</p>
+          <div class="settings-key-row">
+            <input class="settings-key-input" type="password" id="apiKeyInput" placeholder="sk-..." />
+            <button class="btn-sm" id="apiKeyToggleBtn">👁</button>
+          </div>
+          <div class="settings-key-status" id="apiKeyStatus"></div>
+          <div style="font-size:12px;margin-top:6px;color:var(--accent);" id="apiKeyMode"></div>
+          <div class="settings-key-row" style="margin-top:10px;">
+            <button class="btn-sm save" id="apiKeySaveBtn">💾 保存 Key</button>
+            <button class="btn-sm" id="apiKeyTestBtn">🔍 测试连接</button>
+            <button class="btn-sm danger" id="apiKeyClearBtn">清除网页保存的 Key</button>
+          </div>
+          <p style="font-size:11px;color:#adb5bd;margin-top:10px;" id="apiKeyWarning">⚠️ 安全提示：请只在你信任的本地运行版（localhost）中填写 API Key。公开网页中输入任何 API Key 都存在风险。</p>
         </div>
         <div class="settings-card">
           <h3>公开演示版 <span class="settings-badge active">v1.0</span></h3>
@@ -2091,7 +2109,7 @@
           const res = await fetch('/api/fix', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: userText, scenario: selectedScenario }),
+            body: JSON.stringify({ text: userText, scenario: selectedScenario, userApiKey: getUserApiKey() || undefined }),
           });
           const data = await res.json();
           if (res.ok) { renderFixResult(data); return; }
@@ -2104,13 +2122,12 @@
           renderFixResult(demo);
           showToast('当前使用演示结果。配置 API Key 后可分析任意英文。');
         } else {
+          const noBackendMsg = isLocalhost
+            ? '当前未连接 AI 服务。<br><br>你可以在 <a href="#" onclick="document.getElementById(\'settingsBtn\').click();return false" style="color:var(--accent);">设置</a> 中填写自己的 DeepSeek API Key，或继续使用内置示例体验演示模式。<br><br>如果刚启动了 npm start，请确认服务在 http://localhost:3000 运行。'
+            : '当前是公开演示版，不建议在公开页面输入真实 API Key。<br><br>建议下载项目后在本地运行版（npm start + localhost:3000）使用自带 Key。内置示例可直接体验演示模式。';
           resultArea.innerHTML = `
             <div style="padding:24px 28px;">
-              <div class="result-error">
-                当前是公开演示模式。<br><br>
-                内置示例可以直接体验；<br>
-                自定义英文分析需要启动本地后端并配置 API Key（npm start），或等待未来桌面版。
-              </div>
+              <div class="result-error">${noBackendMsg}</div>
             </div>`;
         }
       }
@@ -2417,6 +2434,129 @@
         else settingsPanel.classList.remove('open');
       });
       $('#settingsCloseBtn').addEventListener('click', () => settingsPanel.classList.remove('open'));
+
+      // ═══════════ USER API KEY MANAGEMENT ═══════════
+      const USER_KEY_LS = 'sayright_user_api_key';
+      const isLocalhost = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(window.location.hostname);
+
+      function getUserApiKey() { return (localStorage.getItem(USER_KEY_LS) || '').trim(); }
+      function saveUserApiKey(key) { localStorage.setItem(USER_KEY_LS, key.trim()); }
+      function clearUserApiKeyLS() { localStorage.removeItem(USER_KEY_LS); }
+      function maskApiKey(key) {
+        if (!key || key.length < 12) return '未配置';
+        return key.slice(0, 5) + '****' + key.slice(-4);
+      }
+
+      async function updateApiKeyStatus() {
+        const key = getUserApiKey();
+        const badge = $('#apiKeyBadge');
+        const status = $('#apiKeyStatus');
+        const mode = $('#apiKeyMode');
+        const warning = $('#apiKeyWarning');
+
+        // GitHub Pages warning
+        if (!isLocalhost) {
+          warning.innerHTML = '⚠️ 当前是公开 GitHub Pages 演示版。为了安全，<b>不建议</b>在这里输入真实 API Key。建议下载项目后在本地 localhost 运行版中使用自带 Key。';
+        } else {
+          warning.innerHTML = '⚠️ 安全提示：请只在你信任的本地运行版中填写 API Key。当前是本地运行版，可以使用自带 API Key。';
+        }
+
+        if (key) {
+          // State 1: User saved key
+          badge.textContent = '用户自带 Key';
+          badge.className = 'settings-badge ok';
+          status.innerHTML = `<span style="color:var(--green);">已配置：${maskApiKey(key)}</span>`;
+          mode.innerHTML = '当前 AI 模式：<b>用户自带 Key</b>（优先使用）';
+          $('#apiKeyInput').value = key;
+        } else {
+          $('#apiKeyInput').value = '';
+          // Query backend for .env key existence
+          try {
+            const res = await fetch('/api/key-status');
+            const data = await res.json();
+            if (data.hasEnvKey) {
+              // State 2: .env fallback
+              badge.textContent = '.env Key';
+              badge.className = 'settings-badge ok';
+              status.innerHTML = '<span style="color:var(--accent);">检测到开发者 .env Key</span>';
+              mode.innerHTML = '当前 AI 模式：<b>开发者 .env Key</b>（仅作调试 fallback）。清除网页保存的 Key 不会删除 .env。';
+            } else {
+              // State 3: Demo mode
+              badge.textContent = '演示模式';
+              badge.className = 'settings-badge';
+              status.textContent = '';
+              mode.innerHTML = '当前 AI 模式：<b>演示模式</b>（仅可体验内置示例）';
+            }
+          } catch (_) {
+            // /api/key-status failed (e.g. GitHub Pages) — assume demo mode
+            badge.textContent = '演示模式';
+            badge.className = 'settings-badge';
+            status.textContent = '';
+            mode.innerHTML = '当前 AI 模式：<b>演示模式</b>（仅可体验内置示例）';
+          }
+        }
+      }
+
+      // Toggle password visibility
+      let apiKeyVisible = false;
+      $('#apiKeyToggleBtn').addEventListener('click', () => {
+        apiKeyVisible = !apiKeyVisible;
+        $('#apiKeyInput').type = apiKeyVisible ? 'text' : 'password';
+        $('#apiKeyToggleBtn').textContent = apiKeyVisible ? '🙈' : '👁';
+      });
+
+      // Save key
+      $('#apiKeySaveBtn').addEventListener('click', () => {
+        const input = $('#apiKeyInput').value.trim();
+        if (!input) { showToast('请先输入 API Key。'); return; }
+        if (!input.startsWith('sk-')) { showToast('API Key 格式可能不正确（应以 sk- 开头），请检查。'); }
+        saveUserApiKey(input);
+        updateApiKeyStatus();
+        showToast('API Key 已保存到本地浏览器。');
+      });
+
+      // Clear key
+      $('#apiKeyClearBtn').addEventListener('click', () => {
+        if (!confirm('确定要清除网页保存的 API Key 吗？')) return;
+        clearUserApiKeyLS();
+        updateApiKeyStatus();
+        showToast('网页保存的 API Key 已清除。如果本地 .env 中仍有 Key，真实 AI 模式仍可使用。');
+      });
+
+      // Test key (only tests user-provided key, not .env)
+      async function testApiKey() {
+        let key = $('#apiKeyInput').value.trim();
+        if (!key) key = getUserApiKey();
+        if (!key) { showToast('请先输入或保存你的 DeepSeek API Key。'); return; }
+
+        const testBtn = $('#apiKeyTestBtn');
+        testBtn.textContent = '⏳ 测试中…';
+        testBtn.disabled = true;
+        try {
+          const res = await fetch('/api/test-key', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userApiKey: key }),
+          });
+          const data = await res.json();
+          if (data.ok) {
+            $('#apiKeyStatus').innerHTML = '<span style="color:var(--green);">✅ 测试成功 — API Key 可用。</span>';
+            showToast('API Key 测试成功。');
+          } else {
+            $('#apiKeyStatus').innerHTML = `<span style="color:var(--red);">❌ ${data.message}</span>`;
+            showToast('API Key 测试失败，请检查 Key 或余额。');
+          }
+        } catch (_) {
+          $('#apiKeyStatus').innerHTML = '<span style="color:var(--red);">❌ 无法连接到后端，请确认 npm start 已启动。</span>';
+          showToast('无法连接到后端。');
+        }
+        testBtn.textContent = '🔍 测试连接';
+        testBtn.disabled = false;
+      }
+      $('#apiKeyTestBtn').addEventListener('click', testApiKey);
+
+      // Init key status
+      updateApiKeyStatus();
 
       // Support
       $('#supportBtn').addEventListener('click', () => {
