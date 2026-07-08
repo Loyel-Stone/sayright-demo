@@ -264,6 +264,30 @@
     .why-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
     .why-section p { font-size: 14px; color: var(--text-secondary); line-height: 1.8; }
 
+    /* ── Compare Cards ── */
+    .compare-section { margin-top: 16px; }
+    .compare-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
+    .compare-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+    .compare-card-sm { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; }
+    .compare-card-sm h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .compare-card-sm p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+    /* ── Info Section ── */
+    .info-section { margin-top: 24px; padding: 24px; background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); }
+    .info-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .info-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 8px; }
+    .info-section ul { font-size: 13px; color: var(--text-secondary); line-height: 1.8; padding-left: 18px; margin-bottom: 10px; }
+    .info-section ul li { margin-bottom: 4px; }
+
+    /* ── FAQ ── */
+    .faq-item { border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; overflow: hidden; }
+    .faq-q { padding: 14px 18px; background: #f8f9fa; font-size: 14px; font-weight: 600; cursor: pointer; user-select: none; display: flex; justify-content: space-between; align-items: center; }
+    .faq-q:hover { background: #f0f0f0; }
+    .faq-q::after { content: '▾'; font-size: 11px; color: var(--text-secondary); transition: transform 0.2s; }
+    .faq-item.open .faq-q::after { content: '▴'; }
+    .faq-a { padding: 0 18px; max-height: 0; overflow: hidden; transition: max-height 0.25s ease, padding 0.25s ease; font-size: 13px; color: var(--text-secondary); line-height: 1.7; }
+    .faq-item.open .faq-a { padding: 12px 18px; max-height: 300px; }
+
     /* ── Audience Cards ── */
     .audience-section { margin-top: 16px; }
     .audience-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 12px; }
@@ -347,6 +371,12 @@
       .why-section p { font-size: 13px; }
       .audience-grid { grid-template-columns: 1fr; }
       .audience-section h2 { font-size: 15px; }
+
+      .compare-grid { grid-template-columns: 1fr; }
+      .info-section { padding: 18px 16px; }
+      .info-section h2 { font-size: 15px; }
+      .faq-q { font-size: 13px; padding: 12px 14px; }
+      .faq-a { font-size: 12px; }
 
       .feedback-section { padding: 18px 16px; }
       .feedback-section h2 { font-size: 15px; }
@@ -640,6 +670,29 @@
       <p>很多中文母语者不是不会英文，而是写出来容易带中文表达习惯。SayRight 想解决的不是背单词，而是把已经写出来的英文改得更自然、更礼貌、更符合场景。这是一个个人开发、免费演示、持续迭代的小工具。</p>
     </section>
 
+    <!-- ═══════════ AI COMPARISON ═══════════ -->
+    <section class="compare-section">
+      <h2>🤖 它和普通 AI 聊天有什么区别？</h2>
+      <div class="compare-grid">
+        <div class="compare-card-sm">
+          <h3>🎯 更聚焦</h3>
+          <p>专门处理中文母语者的英文表达问题，不是泛聊天。围绕中式表达、介词错误、语气生硬等高频问题设计。</p>
+        </div>
+        <div class="compare-card-sm">
+          <h3>📊 更结构化</h3>
+          <p>结果拆分为修正版、自然表达、场景最佳表达、中文解释和错误标签，可以直接使用，不是一大段文字。</p>
+        </div>
+        <div class="compare-card-sm">
+          <h3>📚 更适合复习</h3>
+          <p>改过的句子可以保存到个人错误库，后续复习、标记掌握、导出学习报告，不是改完就忘了。</p>
+        </div>
+        <div class="compare-card-sm">
+          <h3>📋 更适合收集</h3>
+          <p>公开版内置 53 条高频中式英文示例，支持搜索、场景筛选和标签筛选，方便快速浏览和体验。</p>
+        </div>
+      </div>
+    </section>
+
     <!-- ═══════════ AUDIENCE ═══════════ -->
     <section class="audience-section">
       <h2>🎯 适合谁用</h2>
@@ -719,6 +772,59 @@
       <p class="feedback-notice">
         🔒 当前版本不会自动上传你的内容。点击按钮只会复制模板，你可以自行决定是否发给作者、评论区或 GitHub Issue。
       </p>
+    </section>
+
+    <!-- ═══════════ PRIVACY ═══════════ -->
+    <section class="info-section">
+      <h2>🔒 隐私友好设计</h2>
+      <ul>
+        <li>当前没有账号系统，不需要注册或登录。</li>
+        <li>个人错误库保存在浏览器 localStorage，不会自动上传到服务器。</li>
+        <li>导出 JSON、导入 JSON、学习报告生成全部在本地浏览器完成。</li>
+        <li>公开演示模式不会把示例体验内容上传到任何地方。</li>
+      </ul>
+      <p style="font-size:12px;margin-top:8px;">⚠️ 真实 AI 模式下，自定义英文会通过本地后端发送给配置的 AI 服务（如 DeepSeek），因此不建议在自定义句子中输入高度敏感的隐私内容。</p>
+    </section>
+
+    <!-- ═══════════ LIMITATIONS ═══════════ -->
+    <section class="info-section">
+      <h2>📌 当前版本限制</h2>
+      <ul>
+        <li>公开演示版只覆盖内置的 53 条示例，自定义英文需要本地后端和 API Key。</li>
+        <li>当前没有账号同步，不同设备间的错误库需要通过导出/导入手动迁移。</li>
+        <li>桌面端 App、浏览器插件和手机端仍在计划中，目前仅提供网页版。</li>
+        <li>AI 分析结果仅供参考，正式邮件、学术论文和合同等场景建议人工复核。</li>
+      </ul>
+      <p style="font-size:12px;margin-top:8px;">SayRight 是个人开发的早期版本，正在持续迭代。如果你有反馈或建议，欢迎通过反馈模板或 GitHub Issue 联系。</p>
+    </section>
+
+    <!-- ═══════════ FAQ ═══════════ -->
+    <section class="info-section">
+      <h2>❓ 常见问题</h2>
+      <div class="faq-item">
+        <div class="faq-q">这是免费的吗？</div>
+        <div class="faq-a">当前公开演示版可以免费体验 53 条内置示例，无需任何配置。真实 AI 分析需要在 .env 中配置自己的 DeepSeek API Key。未来桌面版会支持用户在设置界面填写自己的 API Key，不依赖运营方承担 AI 成本。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">为什么不直接用 ChatGPT？</div>
+        <div class="faq-a">ChatGPT 是很强的通用工具，但 SayRight 更聚焦在中文母语者的英文表达纠错。它把结果拆成修正版、自然表达、场景最佳表达、中文解释和错误标签，方便复习和积累。如果你需要的是垂直场景的英文纠错，SayRight 更顺手。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">我的句子会被上传吗？</div>
+        <div class="faq-a">公开演示模式下，内置示例的体验内容完全在本地浏览器运行，不会上传。真实 AI 模式下，你输入的自定义句子会通过本地后端（server.js）发送给你配置的 AI 服务（如 DeepSeek），请参考对应 AI 服务的隐私政策。当前 SayRight 本身没有服务器数据库，错误库只保存在你的浏览器本地。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">为什么自定义句子不能在公开网页里直接分析？</div>
+        <div class="faq-a">因为公开网页没有后端和 API Key。如果直接在前端调用 AI 接口，API Key 会暴露，且会产生无法控制的调用成本。后续桌面版会解决这个问题——用户在自己的 App 里填写自己的 Key，调用的是自己的额度。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">错误库会不会丢？</div>
+        <div class="faq-a">错误库保存在当前浏览器的 localStorage 中。清理浏览器数据、换设备或换浏览器都会导致数据丢失。建议定期使用「导出 JSON」功能备份错误库，并保存到安全的地方。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">后续会做什么？</div>
+        <div class="faq-a">计划包括桌面端 App（本地保存 API Key 和错误库）、浏览器插件（在网页输入框中直接改英文）、手机端和输入法形态探索。优先做桌面端，因为它最适合本地保存和全局快捷键唤起。详见页面底部的「开发路线」。</div>
+      </div>
     </section>
 
     <!-- ═══════════ SECTION DIVIDER ═══════════ -->
@@ -2441,6 +2547,11 @@
           $('#examplesToggle').textContent = '📋 常见中式英文示例（已收录 50 条）▴';
         }
       }
+
+      // FAQ toggle
+      document.querySelectorAll('.faq-q').forEach(q => {
+        q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
+      });
 
       // Example toggle
       $('#examplesToggle').addEventListener('click', () => {
