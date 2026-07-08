@@ -36,6 +36,17 @@
     .logo span { color: var(--text); font-weight: 600; }
     .subtitle { font-size: 15px; color: var(--text-secondary); }
 
+    /* ── Nav Bar ── */
+    .top-nav { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); padding: 8px 0; margin: 0 -16px; padding-left: 16px; padding-right: 16px; display: flex; gap: 4px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .top-nav::-webkit-scrollbar { display: none; }
+    .top-nav a { font-size: 12px; font-weight: 500; color: var(--text-secondary); text-decoration: none; padding: 5px 14px; border-radius: var(--radius-pill); white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+    .top-nav a:hover, .top-nav a.active { background: var(--accent); color: #fff; }
+
+    /* ── Back to Top ── */
+    .back-to-top { position: fixed; bottom: 24px; right: 20px; width: 40px; height: 40px; border-radius: 50%; background: var(--accent); color: #fff; border: none; font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 60; opacity: 0; pointer-events: none; transition: opacity 0.25s; display: flex; align-items: center; justify-content: center; }
+    .back-to-top.visible { opacity: 1; pointer-events: auto; }
+    .back-to-top:hover { background: var(--accent-dark); }
+
     /* ── Hero ── */
     .hero { margin-top: 28px; }
     .hero-textarea { width: 100%; min-height: 100px; font-size: 18px; font-family: inherit; font-weight: 500; color: var(--text); padding: 18px 20px; background: var(--card); border: 2px solid var(--border); border-radius: 16px; resize: vertical; outline: none; transition: border-color 0.2s, box-shadow 0.2s; line-height: 1.6; }
@@ -340,6 +351,10 @@
       main { padding: 12px 12px 48px; }
       .logo { font-size: 26px; }
       .hero-textarea { font-size: 16px; min-height: 84px; padding: 14px 16px; }
+
+      .top-nav { padding: 6px 0; gap: 2px; }
+      .top-nav a { font-size: 11px; padding: 4px 10px; }
+      .back-to-top { bottom: 18px; right: 14px; width: 36px; height: 36px; font-size: 16px; }
       .btn.primary { font-size: 14px; padding: 10px 22px; }
       .result-body { padding: 20px 16px; gap: 14px; }
       .result-footer { padding: 0 16px 20px; }
@@ -406,8 +421,19 @@
       <button class="btn" id="downloadBtn">下载桌面版</button>
     </div>
 
+    <!-- Top Nav -->
+    <nav class="top-nav" id="topNav">
+      <a href="#try">开始体验</a>
+      <a href="#examples">示例库</a>
+      <a href="#library">错误库</a>
+      <a href="#feedback">反馈</a>
+      <a href="#privacy">隐私</a>
+      <a href="#faq">FAQ</a>
+      <a href="#roadmap">路线图</a>
+    </nav>
+
     <!-- ═══════════ HERO INPUT ═══════════ -->
-    <section class="hero">
+    <section class="hero" id="try">
       <textarea class="hero-textarea" id="heroTextarea"
         placeholder="输入你想修改的英文，比如：I very like this app."></textarea>
 
@@ -456,7 +482,7 @@
       </div>
 
       <!-- Chinglish Examples -->
-      <div class="examples-section">
+      <div class="examples-section" id="examples">
         <span class="examples-toggle" id="examplesToggle">📋 常见中式英文示例（已收录 50 条）▾</span>
         <p style="font-size:11px;color:#adb5bd;margin:4px 0 6px 0;">覆盖中式表达、介词错误、语气生硬、邮件不礼貌、简历太弱、技术表达不清楚等高频问题</p>
 
@@ -609,6 +635,7 @@
     <section class="result-area" id="resultArea"></section>
 
     <!-- ═══════════ ERROR LIBRARY ═══════════ -->
+    <span id="library"></span>
     <section class="error-library" id="errorLibrary">
       <div class="el-header">
         <h2>📚 我的错误库</h2>
@@ -721,7 +748,7 @@
     </section>
 
     <!-- ═══════════ FEEDBACK ═══════════ -->
-    <section class="feedback-section">
+    <section class="feedback-section" id="feedback">
       <h2>📮 提交你的中式英文</h2>
       <p class="feedback-sub">如果你经常写出某种不自然的英文，可以把它整理成反馈模板发给我。后续我会把高频句子加入示例库。</p>
 
@@ -776,7 +803,7 @@
 
     <!-- ═══════════ PRIVACY ═══════════ -->
     <section class="info-section">
-      <h2>🔒 隐私友好设计</h2>
+      <h2 id="privacy">🔒 隐私友好设计</h2>
       <ul>
         <li>当前没有账号系统，不需要注册或登录。</li>
         <li>个人错误库保存在浏览器 localStorage，不会自动上传到服务器。</li>
@@ -799,7 +826,7 @@
     </section>
 
     <!-- ═══════════ FAQ ═══════════ -->
-    <section class="info-section">
+    <section class="info-section" id="faq">
       <h2>❓ 常见问题</h2>
       <div class="faq-item">
         <div class="faq-q">这是免费的吗？</div>
@@ -968,6 +995,7 @@
       </div>
     </section>
     <div class="toast" id="toast"></div>
+    <button class="back-to-top" id="backToTop" title="返回顶部">↑</button>
   </main>
 
   <script>
@@ -2546,6 +2574,32 @@
           grid.classList.add('open');
           $('#examplesToggle').textContent = '📋 常见中式英文示例（已收录 50 条）▴';
         }
+      }
+
+      // ═══════════ NAVIGATION ═══════════
+      // Smooth scroll nav links
+      document.querySelectorAll('.top-nav a').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          const id = a.getAttribute('href').slice(1);
+          const el = document.getElementById(id);
+          if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); history.replaceState(null, '', `#${id}`); }
+        });
+      });
+
+      // Back to top
+      const backToTop = $('#backToTop');
+      window.addEventListener('scroll', () => {
+        backToTop.classList.toggle('visible', window.scrollY > 400);
+      });
+      backToTop.addEventListener('click', () => { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+      // Scroll to hash on load
+      if (window.location.hash) {
+        setTimeout(() => {
+          const el = document.querySelector(window.location.hash);
+          if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        }, 300);
       }
 
       // FAQ toggle
