@@ -1,0 +1,1556 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SayRight — 把中式英文改成自然英文</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8f9fa; --card: #ffffff; --text: #1a1a2e; --text-secondary: #6c757d;
+      --accent: #4f46e5; --accent-light: #eef2ff; --accent-dark: #3730a3;
+      --green: #16a34a; --green-light: #f0fdf4;
+      --orange: #ea580c; --orange-light: #fff7ed;
+      --red: #ef4444; --red-light: #fef2f2;
+      --border: #e9ecef;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-lg: 0 20px 50px rgba(0,0,0,0.08);
+      --radius: 12px; --radius-sm: 8px; --radius-pill: 999px;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: var(--bg); color: var(--text);
+      display: flex; justify-content: center;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    main { width: min(720px, 100%); padding: 20px 16px 60px; display: flex; flex-direction: column; }
+
+    /* ── Header ── */
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0 8px; flex-wrap: wrap; gap: 12px; }
+    .header-left { display: flex; flex-direction: column; gap: 2px; }
+    .logo { font-size: 32px; font-weight: 800; letter-spacing: -0.5px; color: var(--accent); line-height: 1.1; }
+    .logo span { color: var(--text); font-weight: 600; }
+    .subtitle { font-size: 15px; color: var(--text-secondary); }
+
+    /* ── Hero ── */
+    .hero { margin-top: 28px; }
+    .hero-textarea { width: 100%; min-height: 100px; font-size: 18px; font-family: inherit; font-weight: 500; color: var(--text); padding: 18px 20px; background: var(--card); border: 2px solid var(--border); border-radius: 16px; resize: vertical; outline: none; transition: border-color 0.2s, box-shadow 0.2s; line-height: 1.6; }
+    .hero-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(79,70,229,0.1); }
+
+    .scenario-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-top: 14px; margin-bottom: 6px; }
+    .scenario-bar { display: flex; gap: 6px; flex-wrap: wrap; }
+    .scenario-btn { font-size: 12px; padding: 5px 14px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
+    .scenario-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .scenario-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .hero-actions { display: flex; align-items: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .hero-examples { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; }
+    .hero-example-btn { font-size: 12px; padding: 5px 14px; border-radius: var(--radius-pill); border: 1px dashed var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
+    .hero-example-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .hero-desc { margin-top: 16px; font-size: 13px; color: #adb5bd; line-height: 1.7; text-align: center; }
+
+    /* ── Demo Notice ── */
+    .demo-notice { margin-top: 20px; padding: 10px 18px; background: var(--accent-light); border-radius: var(--radius-sm); font-size: 12px; color: var(--accent); text-align: center; line-height: 1.6; border: 1px solid rgba(79,70,229,0.12); }
+
+    /* ── Quick Start ── */
+    .quick-start { margin-top: 14px; background: #f8f9fa; border-radius: var(--radius-sm); padding: 16px 20px; }
+    .quick-start h3 { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+    .quick-start-steps { display: flex; gap: 12px; }
+    .quick-step { flex: 1; text-align: center; }
+    .quick-step-num { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 13px; font-weight: 800; margin-bottom: 6px; }
+    .quick-step p { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 0; }
+
+    /* ── Chinglish Examples ── */
+    .examples-section { margin-top: 18px; }
+    .examples-toggle { font-size: 12px; font-weight: 600; color: var(--accent); cursor: pointer; user-select: none; display: inline-flex; align-items: center; gap: 4px; }
+    .examples-toggle:hover { opacity: 0.8; }
+    .examples-grid { display: none; margin-top: 10px; }
+    .examples-grid.open { display: block; }
+    .example-group { margin-bottom: 12px; }
+    .example-group:last-child { margin-bottom: 0; }
+    .example-group-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 5px; }
+    .example-group-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+    .example-group-btn { font-size: 12px; padding: 4px 12px; border-radius: var(--radius-pill); border: 1px dashed var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
+    .example-group-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* ── Compare Card ── */
+    .compare-card { background: linear-gradient(135deg, #fef2f2 0%, #f0fdf4 100%); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+    .compare-row { display: flex; flex-direction: column; gap: 4px; }
+    .compare-label { font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+    .compare-label.bad  { color: #991b1b; }
+    .compare-label.good { color: var(--green); }
+    .compare-label.best { color: var(--accent); }
+    .compare-value { font-size: 16px; font-weight: 500; line-height: 1.5; color: var(--text); }
+    .compare-value.bad  { text-decoration: line-through; color: var(--text-secondary); }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer; background: var(--card); color: var(--text); transition: all 0.15s ease; white-space: nowrap; user-select: none; font-family: inherit; }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-size: 16px; padding: 12px 28px; font-weight: 600; }
+    .btn.primary:hover { background: var(--accent-dark); border-color: var(--accent-dark); opacity: 1; }
+
+    /* ── Result Area ── */
+    .result-area { margin-top: 24px; background: var(--card); border-radius: 20px; box-shadow: var(--shadow-lg); overflow: hidden; display: none; }
+    .result-area.visible { display: block; }
+    .result-loading { text-align: center; padding: 40px 24px; color: var(--text-secondary); font-size: 15px; }
+    .spinner { display: inline-block; width: 24px; height: 24px; border: 2.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .result-body { padding: 28px 28px 20px; display: flex; flex-direction: column; gap: 18px; }
+    .result-scenario-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 6px 14px; border-radius: var(--radius-pill); align-self: flex-start; }
+    .result-original { font-size: 15px; color: var(--text-secondary); padding: 10px 16px; background: #f8f9fa; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); }
+    .result-row { background: #f8f9fa; border-radius: var(--radius-sm); padding: 16px; }
+    .result-row-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); margin-bottom: 8px; }
+    .result-row-value { font-size: 17px; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .result-row.explanation .result-row-value { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+    .result-row.scenario-version .result-row-value { font-size: 17px; font-weight: 600; color: var(--accent); }
+    .result-alt-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .result-alt-item { font-size: 15px; color: var(--text); padding: 8px 14px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; }
+    .result-alt-num { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-light); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .result-error { text-align: center; padding: 24px 16px; color: #991b1b; font-size: 14px; background: var(--red-light); border-radius: var(--radius-sm); margin: 0 28px 20px; }
+    .result-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+    .result-footer { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 28px 24px; }
+    .error-tag { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-pill); background: var(--red-light); color: #991b1b; }
+
+    .btn-sm { padding: 6px 16px; font-size: 12px; border-radius: var(--radius-pill); border: 1px solid var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
+    .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
+    .btn-sm.save { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+    .btn-sm.save:hover { opacity: 0.85; }
+    .btn-sm.success { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn-sm.success:hover { opacity: 0.85; }
+
+    /* ── Error Library ── */
+    .error-library { margin-top: 24px; background: var(--card); border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; }
+    .el-header { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .el-header h2 { font-size: 17px; font-weight: 700; }
+    .el-count { font-size: 13px; color: var(--text-secondary); }
+    .el-header .spacer { flex: 1; }
+
+    .el-stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .el-stat-card { background: #f8f9fa; border-radius: var(--radius-sm); padding: 14px 12px; text-align: center; }
+    .el-stat-value { font-size: 22px; font-weight: 800; color: var(--text); line-height: 1.2; }
+    .el-stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+    .el-stat-card.accent .el-stat-value { color: var(--accent); }
+    .el-stat-card.green .el-stat-value { color: var(--green); }
+    .el-stat-card.orange .el-stat-value { color: var(--orange); }
+
+    .el-profile { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .el-profile-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+    .el-profile-list { display: flex; flex-direction: column; gap: 8px; }
+    .el-profile-row { display: flex; align-items: center; gap: 10px; }
+    .el-profile-tag { font-size: 12px; font-weight: 600; color: var(--text); min-width: 70px; }
+    .el-profile-bar-wrap { flex: 1; height: 8px; background: #f0f0f0; border-radius: 4px; overflow: hidden; }
+    .el-profile-bar { height: 100%; background: var(--accent); border-radius: 4px; transition: width 0.3s ease; }
+    .el-profile-count { font-size: 12px; font-weight: 700; color: var(--text-secondary); min-width: 24px; text-align: right; }
+
+    .el-filter-bar { display: flex; gap: 6px; padding: 12px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; align-items: center; }
+    .el-filter-sep { font-size: 12px; color: #adb5bd; margin: 0 4px; }
+
+    .el-list { max-height: 480px; overflow-y: auto; }
+    .el-item { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .el-item:last-child { border-bottom: 0; }
+    .el-item.mastered { opacity: 0.65; background: #fafafa; }
+    .el-item-original { font-size: 14px; color: var(--text-secondary); text-decoration: line-through; margin-bottom: 4px; }
+    .el-item-corrected { font-size: 17px; font-weight: 600; color: var(--green); margin-bottom: 4px; }
+    .el-item-natural { font-size: 14px; color: var(--text-secondary); margin-bottom: 4px; }
+    .el-item-scenario-v { font-size: 14px; font-weight: 500; color: var(--accent); margin-bottom: 4px; }
+    .el-item-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .el-item-meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11px; color: #adb5bd; margin-bottom: 8px; }
+    .el-item-meta span { display: flex; align-items: center; gap: 3px; }
+    .el-item-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .el-empty { padding: 48px 24px; text-align: center; color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+
+    /* ── Divider ── */
+    .section-divider { display: flex; align-items: center; gap: 16px; margin: 48px 0 8px; }
+    .section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .section-divider span { font-size: 13px; font-weight: 600; color: #adb5bd; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+
+    /* ── Sentence Filter Bars ── */
+    .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .filter-bar + .filter-bar { margin-top: 8px; }
+    .filter-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-secondary); margin-right: 4px; white-space: nowrap; }
+    .pill { border: 1px solid var(--border); border-radius: var(--radius-pill); padding: 6px 16px; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--card); color: var(--text-secondary); transition: all 0.15s ease; white-space: nowrap; user-select: none; font-family: inherit; }
+    .pill:hover { border-color: var(--accent); color: var(--accent); }
+    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* ── Toolbar ── */
+    .toolbar { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center; }
+    .search-wrap { flex: 1; min-width: 160px; position: relative; }
+    .search-wrap input { width: 100%; padding: 9px 16px 9px 38px; border: 1px solid var(--border); border-radius: var(--radius-pill); font-size: 14px; background: var(--card); color: var(--text); outline: none; transition: border-color 0.15s; font-family: inherit; }
+    .search-wrap input:focus { border-color: var(--accent); }
+    .search-wrap .search-icon { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); font-size: 15px; color: var(--text-secondary); pointer-events: none; }
+    .btn.review-active { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+    /* ── Stats ── */
+    .stats-row { display: flex; gap: 12px; margin-top: 12px; flex-wrap: wrap; }
+    .stat-item { font-size: 12px; color: var(--text-secondary); background: var(--card); border: 1px solid var(--border); padding: 5px 12px; border-radius: var(--radius-pill); display: flex; align-items: center; gap: 4px; }
+    .stat-item .stat-num { font-weight: 700; color: var(--text); }
+
+    /* ── Card ── */
+    .card { background: var(--card); border-radius: 18px; padding: 28px 28px; box-shadow: var(--shadow-lg); margin-top: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+    .tags { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .tag { font-size: 11px; font-weight: 600; letter-spacing: 0.3px; padding: 3px 10px; border-radius: var(--radius-pill); text-transform: uppercase; }
+    .tag-level    { background: var(--accent-light); color: var(--accent); }
+    .tag-type     { background: #f0fdf4; color: #166534; }
+    .tag-mastered { background: var(--green-light); color: var(--green); }
+    .tag-review   { background: var(--orange-light); color: var(--orange); }
+    .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .icon-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--border); background: var(--card); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.15s ease; color: var(--text-secondary); }
+    .icon-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .icon-btn.faved { color: var(--red); border-color: #fecaca; background: var(--red-light); }
+    .icon-btn.mastered { color: var(--green); border-color: #bbf7d0; background: var(--green-light); }
+    .icon-btn.review-later { color: var(--orange); border-color: #fed7aa; background: var(--orange-light); }
+    .en-text { font-size: 26px; font-weight: 700; line-height: 1.4; color: var(--text); }
+    .zh-text { font-size: 19px; line-height: 1.5; color: var(--text-secondary); }
+    .source-text { font-size: 11px; color: #adb5bd; text-align: right; }
+
+    /* ── Nav ── */
+    .nav-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .progress-text { font-size: 14px; font-weight: 500; color: var(--text-secondary); min-width: 80px; text-align: center; }
+
+    /* ── Panels ── */
+    .panel { margin-top: 16px; background: var(--card); border-radius: 18px; box-shadow: var(--shadow-lg); overflow: hidden; display: none; }
+    .panel.open { display: block; }
+    .panel-header { display: flex; align-items: center; gap: 12px; padding: 16px 24px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+    .panel-header h2 { font-size: 16px; font-weight: 700; }
+    .panel-count { font-size: 12px; color: var(--text-secondary); }
+    .panel-header .spacer { flex: 1; }
+    .panel-actions { display: flex; gap: 8px; }
+    .panel-list { max-height: 400px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+    .panel-item { display: flex; align-items: center; gap: 10px; padding: 14px 24px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.1s; }
+    .panel-item:hover { background: #f8f9fa; }
+    .panel-item:last-child { border-bottom: 0; }
+    .panel-item .en-mini { flex: 1; font-size: 14px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .panel-item .zh-mini { font-size: 12px; color: var(--text-secondary); max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .panel-remove { width: 26px; height: 26px; border-radius: 50%; border: none; background: transparent; cursor: pointer; font-size: 13px; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .panel-remove:hover { color: var(--red); background: var(--red-light); }
+    .panel-empty { padding: 40px 24px; text-align: center; color: var(--text-secondary); font-size: 14px; }
+
+    /* ── Settings Panel ── */
+    .settings-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+    .settings-card { background: #f8f9fa; border-radius: var(--radius-sm); padding: 20px; }
+    .settings-card h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .settings-card p { font-size: 13px; color: var(--text-secondary); line-height: 1.7; margin-bottom: 8px; }
+    .settings-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-pill); }
+    .settings-badge.active { background: var(--green-light); color: var(--green); }
+    .settings-badge.soon { background: var(--orange-light); color: var(--orange); }
+
+    /* ── Support & Roadmap ── */
+    .support-section { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border); }
+    .support-section h2 { font-size: 17px; font-weight: 700; margin-bottom: 10px; }
+    .support-section p { font-size: 13px; color: var(--text-secondary); line-height: 1.8; margin-bottom: 14px; }
+    .support-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .roadmap-list { display: flex; flex-direction: column; gap: 12px; }
+    .roadmap-item { background: #f8f9fa; border-radius: var(--radius-sm); padding: 16px; border-left: 3px solid var(--accent); }
+    .roadmap-item h3 { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+    .roadmap-item p { font-size: 12px; color: var(--text-secondary); line-height: 1.6; margin: 0; }
+    .roadmap-item.future { border-left-color: var(--border); opacity: 0.7; }
+    .roadmap-badge { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: var(--radius-pill); margin-left: 6px; vertical-align: middle; }
+    .roadmap-badge.current { background: var(--green-light); color: var(--green); }
+    .roadmap-badge.planned { background: #f0f0f0; color: var(--text-secondary); }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1a2e; color: #fff; padding: 12px 24px; border-radius: var(--radius-pill); font-size: 14px; font-weight: 500; opacity: 0; transition: all 0.3s ease; pointer-events: none; z-index: 100; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Error Banner ── */
+    .error-banner { background: var(--red-light); border: 1px solid #fecaca; color: #991b1b; padding: 20px 24px; border-radius: var(--radius); margin-top: 20px; text-align: center; font-size: 15px; line-height: 1.6; }
+    .error-banner strong { display: block; margin-bottom: 6px; }
+
+    /* ── About ── */
+    .about { margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: #adb5bd; line-height: 1.8; }
+    .about a { color: var(--accent); text-decoration: none; }
+    .about a:hover { text-decoration: underline; }
+
+    /* ── Mobile ── */
+    @media (max-width: 600px) {
+      main { padding: 12px 12px 48px; }
+      .logo { font-size: 26px; }
+      .hero-textarea { font-size: 16px; min-height: 84px; padding: 14px 16px; }
+      .btn.primary { font-size: 14px; padding: 10px 22px; }
+      .result-body { padding: 20px 16px; gap: 14px; }
+      .result-footer { padding: 0 16px 20px; }
+      .filter-bar { gap: 5px; }
+      .pill { padding: 5px 12px; font-size: 12px; }
+      .card { padding: 20px 16px; gap: 12px; border-radius: 14px; }
+      .en-text { font-size: 22px; }
+      .zh-text { font-size: 16px; }
+      .btn { padding: 8px 14px; font-size: 13px; }
+      .nav-row .btn { padding: 10px 20px; font-size: 14px; }
+      .panel-item { padding: 10px 16px; }
+      .panel-item .zh-mini { display: none; }
+      .toolbar { gap: 6px; }
+      .stats-row { gap: 6px; }
+      .stat-item { font-size: 11px; padding: 4px 10px; }
+      .panel-header { padding: 14px 16px; }
+      .panel-header h2 { font-size: 15px; }
+
+      .scenario-bar { gap: 4px; }
+      .scenario-btn { font-size: 11px; padding: 4px 10px; }
+
+      .el-stats-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 12px 16px; }
+      .el-stat-card { padding: 10px 8px; }
+      .el-stat-value { font-size: 18px; }
+      .el-profile { padding: 12px 16px; }
+      .el-filter-bar { padding: 10px 16px; }
+      .el-item { padding: 12px 16px; }
+      .el-header { padding: 14px 16px; }
+      .el-filter-sep { display: none; }
+
+      .section-divider { margin: 36px 0 4px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <!-- ═══════════ HEADER ═══════════ -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo">Say<span>Right</span></div>
+        <div class="subtitle">把中式英文改成自然英文</div>
+      </div>
+      <button class="btn" id="settingsBtn">⚙️ 设置</button>
+      <button class="btn" id="downloadBtn">下载桌面版</button>
+    </div>
+
+    <!-- ═══════════ HERO INPUT ═══════════ -->
+    <section class="hero">
+      <textarea class="hero-textarea" id="heroTextarea"
+        placeholder="输入你想修改的英文，比如：I very like this app."></textarea>
+
+      <!-- Scenario selector -->
+      <div class="scenario-label">📌 选择场景</div>
+      <div class="scenario-bar" id="scenarioBar">
+        <button class="scenario-btn active" data-scenario="general">通用</button>
+        <button class="scenario-btn" data-scenario="daily_chat">日常聊天</button>
+        <button class="scenario-btn" data-scenario="work_email">工作邮件</button>
+        <button class="scenario-btn" data-scenario="workplace">职场沟通</button>
+        <button class="scenario-btn" data-scenario="academic">学术表达</button>
+        <button class="scenario-btn" data-scenario="resume">简历优化</button>
+        <button class="scenario-btn" data-scenario="social_media">社交媒体</button>
+      </div>
+
+      <div class="hero-actions">
+        <button class="btn primary" id="heroFixBtn">✨ 开始纠错</button>
+        <button class="btn" id="heroReviewBtn">📚 复习我的错误</button>
+      </div>
+      <p class="hero-desc">
+        <span style="font-weight:600;color:var(--text);">别再写中式英文了。</span>输入一句英文，SayRight 帮你改成自然、礼貌、符合场景的表达。Ctrl+Enter 快速发送。
+      </p>
+
+      <!-- Demo Notice -->
+      <div class="demo-notice">
+        💡 当前网页版支持演示模式：点击内置示例即可体验。自定义英文分析需要本地后端（<code>npm start</code>）或未来桌面版。
+      </div>
+
+      <!-- Quick Start -->
+      <div class="quick-start" id="quickStart">
+        <h3>🚀 快速体验</h3>
+        <div class="quick-start-steps">
+          <div class="quick-step">
+            <div class="quick-step-num">1</div>
+            <p>点击一个常见中式英文示例</p>
+          </div>
+          <div class="quick-step">
+            <div class="quick-step-num">2</div>
+            <p>点击「开始纠错」</p>
+          </div>
+          <div class="quick-step">
+            <div class="quick-step-num">3</div>
+            <p>复制自然表达或分享文案</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chinglish Examples -->
+      <div class="examples-section">
+        <span class="examples-toggle" id="examplesToggle">📋 常见中式英文示例 ▾</span>
+        <div class="examples-grid" id="examplesGrid">
+          <div class="example-group">
+            <div class="example-group-title">通用</div>
+            <div class="example-group-btns">
+              <button class="example-group-btn" data-scene="general" data-text="I very like this app.">I very like this app.</button>
+              <button class="example-group-btn" data-scene="general" data-text="My English is poor.">My English is poor.</button>
+              <button class="example-group-btn" data-scene="general" data-text="I think this is not very good.">I think this is not very good.</button>
+            </div>
+          </div>
+          <div class="example-group">
+            <div class="example-group-title">日常聊天</div>
+            <div class="example-group-btns">
+              <button class="example-group-btn" data-scene="daily_chat" data-text="I am boring today.">I am boring today.</button>
+              <button class="example-group-btn" data-scene="daily_chat" data-text="Long time no see you.">Long time no see you.</button>
+              <button class="example-group-btn" data-scene="daily_chat" data-text="I want to go to home.">I want to go to home.</button>
+            </div>
+          </div>
+          <div class="example-group">
+            <div class="example-group-title">工作邮件</div>
+            <div class="example-group-btns">
+              <button class="example-group-btn" data-scene="work_email" data-text="I want to ask about the meeting.">I want to ask about the meeting.</button>
+              <button class="example-group-btn" data-scene="work_email" data-text="Please reply me as soon as possible.">Please reply me asap.</button>
+              <button class="example-group-btn" data-scene="work_email" data-text="I have a question want to ask you.">I have a question want to ask you.</button>
+            </div>
+          </div>
+          <div class="example-group">
+            <div class="example-group-title">职场沟通</div>
+            <div class="example-group-btns">
+              <button class="example-group-btn" data-scene="workplace" data-text="Can you help me to see this?">Can you help me to see this?</button>
+              <button class="example-group-btn" data-scene="workplace" data-text="I will finish it until tomorrow.">I will finish it until tomorrow.</button>
+              <button class="example-group-btn" data-scene="workplace" data-text="Let me know your idea.">Let me know your idea.</button>
+            </div>
+          </div>
+          <div class="example-group">
+            <div class="example-group-title">简历优化</div>
+            <div class="example-group-btns">
+              <button class="example-group-btn" data-scene="resume" data-text="I did many works in this company.">I did many works in this company.</button>
+              <button class="example-group-btn" data-scene="resume" data-text="I am responsible for many things.">I am responsible for many things.</button>
+              <button class="example-group-btn" data-scene="resume" data-text="I helped the company get better.">I helped the company get better.</button>
+            </div>
+          </div>
+          <div class="example-group">
+            <div class="example-group-title">社交媒体</div>
+            <div class="example-group-btns">
+              <button class="example-group-btn" data-scene="social_media" data-text="This thing makes me very happy.">This thing makes me very happy.</button>
+              <button class="example-group-btn" data-scene="social_media" data-text="I want to share my feeling.">I want to share my feeling.</button>
+              <button class="example-group-btn" data-scene="social_media" data-text="This app is very useful for me.">This app is very useful for me.</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ RESULT AREA ═══════════ -->
+    <section class="result-area" id="resultArea"></section>
+
+    <!-- ═══════════ ERROR LIBRARY ═══════════ -->
+    <section class="error-library" id="errorLibrary">
+      <div class="el-header">
+        <h2>📚 我的错误库</h2>
+        <span class="el-count" id="elCount">0 条</span>
+        <span class="spacer"></span>
+        <button class="btn-sm danger" id="elClearBtn">清空错误库</button>
+      </div>
+
+      <div class="el-stats-grid" id="elStatsGrid">
+        <div class="el-stat-card"><div class="el-stat-value" id="elStatTotal">0</div><div class="el-stat-label">总错误数</div></div>
+        <div class="el-stat-card green"><div class="el-stat-value" id="elStatMastered">0</div><div class="el-stat-label">已掌握</div></div>
+        <div class="el-stat-card orange"><div class="el-stat-value" id="elStatPending">0</div><div class="el-stat-label">待复习</div></div>
+        <div class="el-stat-card accent"><div class="el-stat-value" id="elStatTopTag">-</div><div class="el-stat-label">最常见标签</div></div>
+      </div>
+
+      <div class="el-profile" id="elProfile" style="display:none;">
+        <div class="el-profile-title">错误画像</div>
+        <div class="el-profile-list" id="elProfileList"></div>
+      </div>
+
+      <!-- Filters: mastery + scenario -->
+      <div class="el-filter-bar" id="elFilterBar">
+        <button class="pill active" data-el-filter="all">全部</button>
+        <button class="pill" data-el-filter="pending">待复习</button>
+        <button class="pill" data-el-filter="mastered">已掌握</button>
+        <span class="el-filter-sep">|</span>
+        <button class="pill active" data-el-scene="all">全部场景</button>
+        <button class="pill" data-el-scene="general">通用</button>
+        <button class="pill" data-el-scene="daily_chat">日常聊天</button>
+        <button class="pill" data-el-scene="work_email">工作邮件</button>
+        <button class="pill" data-el-scene="workplace">职场沟通</button>
+        <button class="pill" data-el-scene="academic">学术</button>
+        <button class="pill" data-el-scene="resume">简历</button>
+        <button class="pill" data-el-scene="social_media">社交</button>
+      </div>
+
+      <div class="el-list" id="elList">
+        <div class="el-empty" id="elEmpty">你还没有保存错误。先纠正一句英文，再把它加入错误库。</div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SECTION DIVIDER ═══════════ -->
+    <div class="section-divider"><span>参考例句库</span></div>
+
+    <!-- ═══════════ SENTENCE LIBRARY ═══════════ -->
+    <div class="filter-bar" id="levelBar">
+      <span class="filter-label">等级</span>
+      <button class="pill active" data-level="all">All</button>
+      <button class="pill" data-level="A1">A1</button>
+      <button class="pill" data-level="A2">A2</button>
+    </div>
+    <div class="filter-bar" id="typeBar">
+      <span class="filter-label">场景</span>
+      <button class="pill active" data-type="all">All</button>
+      <button class="pill" data-type="daily">日常</button>
+      <button class="pill" data-type="social">社交</button>
+      <button class="pill" data-type="work">工作</button>
+      <button class="pill" data-type="travel">旅行</button>
+    </div>
+    <div class="toolbar">
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="搜索英文或中文…" />
+      </div>
+      <button class="btn" id="randomBtn">🎲 随机</button>
+      <button class="btn" id="reviewModeBtn">📝 复习</button>
+      <button class="btn" id="favToggleBtn">⭐ 收藏</button>
+    </div>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-item">📖 今日浏览 <span class="stat-num" id="statBrowsed">0</span></div>
+      <div class="stat-item">✅ 今日掌握 <span class="stat-num" id="statMastered">0</span></div>
+      <div class="stat-item">📝 待复习 <span class="stat-num" id="statReview">0</span></div>
+    </div>
+    <div class="error-banner" id="errorBanner" style="display:none;">
+      <strong>⚠️ 数据加载失败</strong>
+      无法读取 data_db.json，请确认文件存在且服务器正在运行。
+    </div>
+    <section class="card" id="card">
+      <div class="card-top">
+        <div class="tags" id="tagsEl">
+          <span class="tag tag-level" id="tagLevel">-</span>
+          <span class="tag tag-type" id="tagType">-</span>
+        </div>
+        <div class="card-actions">
+          <button class="icon-btn" id="masteredBtn" title="已掌握">✅</button>
+          <button class="icon-btn" id="reviewLaterBtn" title="稍后复习">📝</button>
+          <button class="icon-btn" id="copyBtn" title="复制">📋</button>
+          <button class="icon-btn" id="favBtn" title="收藏">🤍</button>
+        </div>
+      </div>
+      <div class="en-text" id="enText">正在加载数据…</div>
+      <div class="zh-text" id="zhText">请确认 data_db.json 可访问</div>
+      <div class="source-text">Source: Tatoeba Project</div>
+    </section>
+    <div class="nav-row">
+      <button class="btn" id="prevBtn">← 上一句</button>
+      <span class="progress-text" id="progressText">0 / 0</span>
+      <button class="btn" id="nextBtn">下一句 →</button>
+    </div>
+    <div class="panel" id="favPanel">
+      <div class="panel-header">
+        <h2>⭐ 收藏句子</h2>
+        <span class="panel-count" id="favCount">0 条</span>
+        <span class="spacer"></span>
+        <div class="panel-actions">
+          <button class="btn-sm" id="favExportBtn">导出</button>
+          <button class="btn-sm danger" id="favClearBtn">清空</button>
+        </div>
+        <button class="btn-sm" id="favCloseBtn">关闭</button>
+      </div>
+      <ul class="panel-list" id="favList"></ul>
+      <div class="panel-empty" id="favEmpty" style="display:none;">还没有收藏任何句子</div>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="panel" id="settingsPanel">
+      <div class="panel-header">
+        <h2>⚙️ 设置</h2>
+        <span class="spacer"></span>
+        <button class="btn-sm" id="settingsCloseBtn">关闭</button>
+      </div>
+      <div class="settings-body">
+        <div class="settings-card">
+          <h3>API Key 说明 <span class="settings-badge active">当前可用</span></h3>
+          <p>当前默认使用本地后端 <code>.env</code> 中配置的 DeepSeek API Key。所有 AI 请求通过本地服务器转发，API Key 不会暴露给前端。</p>
+          <p style="font-size:12px;color:#adb5bd;">如果你自己部署此项目，需要在项目根目录创建 <code>.env</code> 文件并填写 <code>DEEPSEEK_API_KEY=你的Key</code>。</p>
+        </div>
+        <div class="settings-card">
+          <h3>自带 API Key <span class="settings-badge soon">待开发</span></h3>
+          <p>桌面版和浏览器插件版将支持用户填写自己的 DeepSeek API Key，无需依赖运营方承担 AI 成本。你的 Key 只保存在本地设备，不上传到任何服务器。</p>
+          <p style="font-size:12px;color:#adb5bd;">此功能预计在桌面端 App v1.0 中提供。网页版出于安全考虑，暂不支持在浏览器中保存真实 API Key。</p>
+        </div>
+        <div class="settings-card">
+          <h3>公开演示版 <span class="settings-badge active">v1.0</span></h3>
+          <p>当前 SayRight 以公开演示版形式发布。内置示例可直接体验纠错效果，无需任何配置。自定义英文需要真实 AI 模式（在 <code>.env</code> 中配置 <code>DEEPSEEK_API_KEY</code>）。未来桌面版将支持用户自带 API Key，无门槛使用完整功能。</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="about">
+      <p>句子数据来自 <a href="https://tatoeba.org" target="_blank" rel="noopener">Tatoeba Project</a>，中文已转为简体。</p>
+      <p>SayRight — AI 英文表达纠错工具，面向中文母语者。所有数据保存在你的浏览器中。</p>
+    </footer>
+
+    <!-- Support & Roadmap -->
+    <section class="support-section">
+      <h2>💛 支持开发</h2>
+      <p>SayRight 目前由个人开发和维护。网页版会尽量保持免费试用，AI 调用会产生实际成本。如果这个工具对你有帮助，可以通过打赏支持后续开发。</p>
+      <div class="support-actions">
+        <button class="btn" id="supportBtn">💛 支持开发</button>
+        <button class="btn" id="roadmapBtn">🗺️ 查看开发路线</button>
+      </div>
+
+      <div id="roadmapSection" style="display:none;">
+        <h2 style="margin-bottom:14px;">🗺️ 开发路线</h2>
+        <div class="roadmap-list">
+          <div class="roadmap-item">
+            <h3>v0.x 网页免费试用版 <span class="roadmap-badge current">当前</span></h3>
+            <p>体验核心 AI 纠错和场景化改写能力，错误库本地存储。</p>
+          </div>
+          <div class="roadmap-item future">
+            <h3>v1.0 桌面端 App <span class="roadmap-badge planned">计划中</span></h3>
+            <p>完整错误库、本地历史记录、全局快捷键唤起、支持填写自己的 API Key。预计支持 macOS 和 Windows。</p>
+          </div>
+          <div class="roadmap-item future">
+            <h3>v1.5 浏览器插件 <span class="roadmap-badge planned">计划中</span></h3>
+            <p>在 Gmail、Notion、GitHub、Google Docs 等网页输入框中直接改英文，无需切换工具。</p>
+          </div>
+          <div class="roadmap-item future">
+            <h3>v2.0 手机端 App <span class="roadmap-badge planned">计划中</span></h3>
+            <p>移动端英文表达助手，支持 iOS 和 Android。</p>
+          </div>
+          <div class="roadmap-item future">
+            <h3>v3.0 输入法形态探索 <span class="roadmap-badge planned">长期</span></h3>
+            <p>长期探索方向，需要解决隐私保护和系统限制等关键问题。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="toast" id="toast"></div>
+  </main>
+
+  <script>
+    (function () {
+      // ═══════════ STATE ═══════════
+      let allData = [];
+      let filteredData = [];
+      let currentIndex = 0;
+      let currentLevel = 'all';
+      let currentType = 'all';
+      let searchQuery = '';
+      let reviewMode = false;
+      let selectedScenario = 'general';
+      let elFilter = 'all';
+      let elSceneFilter = 'all';
+
+      // ═══════════ SCENARIO CONFIG ═══════════
+      const SCENARIOS = {
+        general:      '通用',
+        daily_chat:   '日常聊天',
+        work_email:   '工作邮件',
+        workplace:    '职场沟通',
+        academic:     '学术表达',
+        resume:       '简历优化',
+        social_media: '社交媒体',
+      };
+
+      // ═══════════ DEMO RESULTS ═══════════
+      // Preset corrections for 18 common Chinglish examples so the tool
+      // works without a backend for demo / screencast purposes.
+      const DEMO_RESULTS = {
+        // ── 通用 ──
+        "i very like this app.": {
+          original: "I very like this app.",
+          corrected: "I really like this app.",
+          natural: "I love this app.",
+          scenarioVersion: "I really enjoy using this app — it's been super helpful.",
+          explanationZh: "'very like' 是中文「很喜欢」的直译，英语中 very 不能直接修饰动词 like。正确表达用 really like 或直接说 love，更自然。场景版本加入了具体原因，让表达更完整。",
+          alternatives: ["I'm a big fan of this app.", "This app has been great for me.", "I've been really enjoying this app."],
+          tags: ["中式表达", "动词搭配"],
+          scenario: "general",
+          demo: true,
+        },
+        "my english is poor.": {
+          original: "My English is poor.",
+          corrected: "My English is not very good.",
+          natural: "I'm still working on my English.",
+          scenarioVersion: "I'm still working on my English, but I'm improving every day.",
+          explanationZh: "'My English is poor' 语法正确但听起来很消极且不自然。英语母语者更常用 'still working on' 或 'not very confident' 来表达。场景版本加了积极的态度。",
+          alternatives: ["My English isn't perfect yet.", "I'm not very confident in my English.", "English is still a work in progress for me."],
+          tags: ["语气不自然", "中式表达"],
+          scenario: "general",
+          demo: true,
+        },
+        "i think this is not very good.": {
+          original: "I think this is not very good.",
+          corrected: "I don't think this is very good.",
+          natural: "I don't think this is great.",
+          scenarioVersion: "I'm not sure this is the best option — what do you think?",
+          explanationZh: "英语中否定通常放在主句动词上（'I don't think'），而不是从句中（'I think ... not'）。场景版本用了更委婉的表达方式，适合通用场景。",
+          alternatives: ["I'm not convinced this is ideal.", "This might not be the best approach.", "I have some doubts about this."],
+          tags: ["词序问题", "中式表达"],
+          scenario: "general",
+          demo: true,
+        },
+        // ── 日常聊天 ──
+        "i am boring today.": {
+          original: "I am boring today.",
+          corrected: "I am bored today.",
+          natural: "I'm feeling bored today.",
+          scenarioVersion: "I'm so bored today, nothing to do!",
+          explanationZh: "boring 表示「令人无聊的」，bored 表示「感到无聊的」。说 I am boring 是在说自己是个无聊的人。日常聊天场景用口语化的 feel bored、so bored 更自然。",
+          alternatives: ["I'm kinda bored today.", "Been feeling bored all day.", "Nothing interesting happening today."],
+          tags: ["中式表达", "语法错误"],
+          scenario: "daily_chat",
+          demo: true,
+        },
+        "long time no see you.": {
+          original: "Long time no see you.",
+          corrected: "Long time no see.",
+          natural: "Long time no see!",
+          scenarioVersion: "Hey! Long time no see, how have you been?",
+          explanationZh: "'Long time no see' 是固定表达，后面不需要加 you。本身已经是口语化的打招呼方式。聊天场景中加个问候更自然。",
+          alternatives: ["It's been a while!", "Haven't seen you in ages!", "Long time! How's everything?"],
+          tags: ["语法错误"],
+          scenario: "daily_chat",
+          demo: true,
+        },
+        "i want to go to home.": {
+          original: "I want to go to home.",
+          corrected: "I want to go home.",
+          natural: "I wanna go home.",
+          scenarioVersion: "I think I'm gonna head home now.",
+          explanationZh: "go home 是固定搭配，不加 to。类似的还有 go to school/work/bed（不加 the）。日常聊天中 wanna/gonna 更口语化。",
+          alternatives: ["I should head home.", "Time to go home I think.", "I'm ready to call it a day."],
+          tags: ["介词错误", "中式表达"],
+          scenario: "daily_chat",
+          demo: true,
+        },
+        // ── 工作邮件 ──
+        "i want to ask about the meeting.": {
+          original: "I want to ask about the meeting.",
+          corrected: "I'd like to ask about the meeting.",
+          natural: "I was wondering if you could give me an update on the meeting.",
+          scenarioVersion: "Hi, hope you're well. I was wondering if you could share an update on the meeting when you have a moment. Thanks!",
+          explanationZh: "商务邮件中 'I want' 听起来太直接甚至有点粗鲁。用 'I'd like to' 或 'I was wondering if' 更礼貌。场景版本加入了问候语和结尾谢谢，符合英文邮件习惯。",
+          alternatives: ["Could you please update me on the meeting status?", "I'd appreciate an update on the meeting when convenient.", "Following up on the meeting — any updates to share?"],
+          tags: ["语气不自然", "中式表达"],
+          scenario: "work_email",
+          demo: true,
+        },
+        "please reply me as soon as possible.": {
+          original: "Please reply me as soon as possible.",
+          corrected: "Please reply to me as soon as possible.",
+          natural: "Could you please get back to me when you have a chance?",
+          scenarioVersion: "Looking forward to hearing from you. No rush, but I'd appreciate a reply when you can.",
+          explanationZh: "reply 是不及物动词，需要加 to。'as soon as possible' 在邮件中有时显得催促感太强。场景版本用 'looking forward to hearing from you' 更得体。",
+          alternatives: ["I look forward to your reply.", "Please let me know at your earliest convenience.", "When you get a moment, I'd love to hear back."],
+          tags: ["介词错误", "语气不自然"],
+          scenario: "work_email",
+          demo: true,
+        },
+        "i have a question want to ask you.": {
+          original: "I have a question want to ask you.",
+          corrected: "I have a question I want to ask you.",
+          natural: "I have a question for you.",
+          scenarioVersion: "I have a quick question I'd like to run by you — let me know when you're free.",
+          explanationZh: "原句中 'want to ask you' 缺少关系代词 'that/which' 或主语 'I'。但更自然的说法是 'I have a question for you'。场景版本加入了 'quick' 和 'run by you' 等地道表达。",
+          alternatives: ["There's something I'd like to ask you about.", "Could I ask you a quick question?", "I wanted to get your thoughts on something."],
+          tags: ["语法错误", "中式表达"],
+          scenario: "work_email",
+          demo: true,
+        },
+        // ── 职场沟通 ──
+        "can you help me to see this?": {
+          original: "Can you help me to see this?",
+          corrected: "Can you help me look at this?",
+          natural: "Could you take a look at this?",
+          scenarioVersion: "Could you take a quick look at this when you have a moment? I'd appreciate your feedback.",
+          explanationZh: "'help me to see' 是逐字翻译中文「帮我看一下」。英语中 review/take a look at/check 才是正确的表达。场景版本用 could 比 can 更礼貌。",
+          alternatives: ["Would you mind reviewing this?", "Can you check this for me?", "I'd love your eyes on this."],
+          tags: ["中式表达", "动词搭配"],
+          scenario: "workplace",
+          demo: true,
+        },
+        "i will finish it until tomorrow.": {
+          original: "I will finish it until tomorrow.",
+          corrected: "I will finish it by tomorrow.",
+          natural: "I'll have it done by tomorrow.",
+          scenarioVersion: "I'll get this wrapped up by tomorrow — will send it over as soon as it's ready.",
+          explanationZh: "until 表示「一直持续到某个时间」，by 才表示「在某个时间之前完成」。这是典型的时态/介词混淆。职场沟通中用 'get it wrapped up' 更地道。",
+          alternatives: ["This will be ready by tomorrow.", "I'll complete this by end of day tomorrow.", "You'll have it by tomorrow."],
+          tags: ["介词错误", "中式表达"],
+          scenario: "workplace",
+          demo: true,
+        },
+        "let me know your idea.": {
+          original: "Let me know your idea.",
+          corrected: "Let me know your ideas.",
+          natural: "Let me know what you think.",
+          scenarioVersion: "Would love to hear your thoughts on this — let me know what you think when you can.",
+          explanationZh: "原句基本正确但略显生硬。'Let me know what you think' 更常用。'idea' 应为复数或改用 thoughts/feedback。场景版本加入 'would love to hear' 让语气更友好。",
+          alternatives: ["I'd love to get your input.", "What do you think about this?", "Any thoughts you have would be great."],
+          tags: ["语气不自然"],
+          scenario: "workplace",
+          demo: true,
+        },
+        // ── 简历优化 ──
+        "i did many works in this company.": {
+          original: "I did many works in this company.",
+          corrected: "I handled many responsibilities in this company.",
+          natural: "I took on a wide range of responsibilities.",
+          scenarioVersion: "Managed multiple cross-functional initiatives, delivering measurable results across key business areas.",
+          explanationZh: "work 作「工作」解时是不可数名词，不能说 many works。简历应该用行动动词（action verbs）如 managed/led/drove，并加上量化成果。场景版本使用了简历风格的 bullet point。",
+          alternatives: ["Led diverse projects across multiple departments.", "Owned several key initiatives and delivered consistent results.", "Drove multiple workstreams from planning to execution."],
+          tags: ["语法错误", "中式表达"],
+          scenario: "resume",
+          demo: true,
+        },
+        "i am responsible for many things.": {
+          original: "I am responsible for many things.",
+          corrected: "I am responsible for multiple areas of the business.",
+          natural: "I oversee a broad range of operations.",
+          scenarioVersion: "Oversee end-to-end operations spanning project management, team coordination, and process optimization.",
+          explanationZh: "'many things' 太模糊，简历需要具体。用 oversee/manage/coordinate 等行动动词 + 具体领域。场景版本展示了一个完整的简历 bullet point 应该有的结构。",
+          alternatives: ["Manage cross-functional operations and team coordination.", "Lead key operational functions including project delivery and team management.", "Own critical business operations across multiple departments."],
+          tags: ["语气不自然"],
+          scenario: "resume",
+          demo: true,
+        },
+        "i helped the company get better.": {
+          original: "I helped the company get better.",
+          corrected: "I contributed to the company's growth.",
+          natural: "I played a key role in improving company performance.",
+          scenarioVersion: "Drove a 15% improvement in operational efficiency by streamlining workflows and implementing best practices.",
+          explanationZh: "helped...get better 太口语化且缺乏说服力。简历要用 drove/improved/delivered 等强力动词，并加入具体数字。场景版本展示了理想简历格式。",
+          alternatives: ["Improved team productivity through process optimization.", "Delivered measurable improvements in operational efficiency.", "Led initiatives that enhanced company-wide performance."],
+          tags: ["中式表达", "语气不自然"],
+          scenario: "resume",
+          demo: true,
+        },
+        // ── 社交媒体 ──
+        "this thing makes me very happy.": {
+          original: "This thing makes me very happy.",
+          corrected: "This makes me really happy.",
+          natural: "This makes me so happy!",
+          scenarioVersion: "This makes me so happy! 😊 Absolutely loving it.",
+          explanationZh: "'thing' 指代不明确，英语中可直接省略。社交媒体风格更短、更直接、有情绪。场景版本加入 emoji 和感叹号让表达更活泼。",
+          alternatives: ["Obsessed with this! So good.", "Can't stop smiling. This is amazing.", "This just made my day!"],
+          tags: ["中式表达", "语气不自然"],
+          scenario: "social_media",
+          demo: true,
+        },
+        "i want to share my feeling.": {
+          original: "I want to share my feeling.",
+          corrected: "I want to share my feelings.",
+          natural: "Just wanted to share how I feel.",
+          scenarioVersion: "Had to share this — feeling so grateful right now. ✨",
+          explanationZh: "feeling 表示「感受」时通常用复数 feelings。社交媒体帖文更口语化，'just wanted to share' 比 'I want to share' 更轻松自然。",
+          alternatives: ["Can't hold this in — feeling amazing!", "Sharing some thoughts because I can't keep them in.", "Just want to put this out there..."],
+          tags: ["语法错误", "语气不自然"],
+          scenario: "social_media",
+          demo: true,
+        },
+        "this app is very useful for me.": {
+          original: "This app is very useful for me.",
+          corrected: "This app is very useful to me.",
+          natural: "This app has been super helpful.",
+          scenarioVersion: "This app is a game changer! 🔥 Highly recommend if you need help with English writing.",
+          explanationZh: "useful to me 比 useful for me 更地道，但社交媒体上用 'super helpful' 或 'game changer' 更有感染力。场景版本加入了推荐语气，适合社交分享。",
+          alternatives: ["Can't recommend this app enough!", "This app has been a lifesaver for my English.", "If you struggle with English writing, you need this app."],
+          tags: ["介词错误", "语气不自然"],
+          scenario: "social_media",
+          demo: true,
+        },
+      };
+
+      // ═══════════ LS KEYS ═══════════
+      const FAV_KEY       = 'sayright_favorites';
+      const MASTERED_KEY  = 'sayright_mastered';
+      const REVIEW_KEY    = 'sayright_review';
+      const DAILY_KEY     = 'sayright_daily';
+      const ERROR_LIB_KEY = 'sayright_error_library';
+
+      // ═══════════ HELPERS ═══════════
+      const $  = (sel) => document.querySelector(sel);
+      const $$ = (sel) => document.querySelectorAll(sel);
+
+      function lsGet(key, fallback) {
+        try { return JSON.parse(localStorage.getItem(key)) || fallback; }
+        catch { return fallback; }
+      }
+      function lsSet(key, val) { localStorage.setItem(key, JSON.stringify(val)); }
+
+      function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+
+      function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+      function timeAgo(ts) {
+        const diff = Date.now() - ts;
+        if (diff < 60000) return '刚刚';
+        if (diff < 3600000) return `${Math.floor(diff / 60000)} 分钟前`;
+        if (diff < 86400000) return `${Math.floor(diff / 3600000)} 小时前`;
+        return `${Math.floor(diff / 86400000)} 天前`;
+      }
+
+      let toastTimer = null;
+      function showToast(msg) {
+        if (toastTimer) clearTimeout(toastTimer);
+        toast.textContent = msg;
+        toast.classList.add('show');
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+      }
+
+      // ═══════════ DOM REFS ═══════════
+      const toast          = $('#toast');
+      const heroTextarea   = $('#heroTextarea');
+      const heroFixBtn     = $('#heroFixBtn');
+      const resultArea     = $('#resultArea');
+      const errorLibrary   = $('#errorLibrary');
+      const elList         = $('#elList');
+      const elCount        = $('#elCount');
+      const elFilterBar    = $('#elFilterBar');
+      const elStatsGrid    = $('#elStatsGrid');
+      const elProfile      = $('#elProfile');
+      const elProfileList  = $('#elProfileList');
+      const elStatTotal    = $('#elStatTotal');
+      const elStatMastered = $('#elStatMastered');
+      const elStatPending  = $('#elStatPending');
+      const elStatTopTag   = $('#elStatTopTag');
+      const tagsEl         = $('#tagsEl');
+      const tagLevel       = $('#tagLevel');
+      const tagType        = $('#tagType');
+      const enText         = $('#enText');
+      const zhText         = $('#zhText');
+      const progressText   = $('#progressText');
+      const card           = $('#card');
+      const errorBanner    = $('#errorBanner');
+      const searchInput    = $('#searchInput');
+      const masteredBtn    = $('#masteredBtn');
+      const reviewLaterBtn = $('#reviewLaterBtn');
+      const favBtn         = $('#favBtn');
+      const reviewModeBtn  = $('#reviewModeBtn');
+      const favPanel       = $('#favPanel');
+      const favList        = $('#favList');
+      const favCount       = $('#favCount');
+      const favEmpty       = $('#favEmpty');
+      const statBrowsed    = $('#statBrowsed');
+      const statMastered   = $('#statMastered');
+      const statReview     = $('#statReview');
+
+      // ═══════════ ERROR LIBRARY ═══════════
+      function migrateEntry(entry, i) {
+        return {
+          id:              entry.id || generateId(),
+          original:        entry.original || '',
+          corrected:       entry.corrected || '',
+          natural:         entry.natural || '',
+          scenarioVersion: entry.scenarioVersion || entry.natural || entry.corrected || '',
+          explanationZh:   entry.explanationZh || entry.explanation || '',
+          alternatives:    entry.alternatives || [],
+          tags:            entry.tags || [],
+          scenario:        entry.scenario || 'general',
+          scenarioLabel:   entry.scenarioLabel || SCENARIOS[entry.scenario] || '通用',
+          createdAt:       entry.createdAt || entry.savedAt || (Date.now() - (i * 1000)),
+          reviewCount:     entry.reviewCount || 0,
+          mastered:        entry.mastered || false,
+          lastReviewedAt:  entry.lastReviewedAt || null,
+        };
+      }
+
+      function loadErrorLib() {
+        const raw = lsGet(ERROR_LIB_KEY, []);
+        if (!raw.length) return [];
+        const first = raw[0];
+        if (first.id === undefined || first.reviewCount === undefined || first.scenarioLabel === undefined) {
+          const migrated = raw.map(migrateEntry);
+          saveErrorLib(migrated);
+          return migrated;
+        }
+        return raw;
+      }
+
+      function saveErrorLib(v) { lsSet(ERROR_LIB_KEY, v); }
+
+      function addToErrorLib(entry) {
+        const lib = loadErrorLib();
+        lib.unshift({
+          id: generateId(),
+          original: entry.original,
+          corrected: entry.corrected,
+          natural: entry.natural,
+          scenarioVersion: entry.scenarioVersion || entry.natural || entry.corrected || '',
+          explanationZh: entry.explanationZh || entry.explanation || '',
+          alternatives: entry.alternatives || [],
+          tags: entry.tags || [],
+          scenario: entry.scenario || 'general',
+          scenarioLabel: entry.scenarioLabel || SCENARIOS[entry.scenario] || '通用',
+          createdAt: Date.now(),
+          reviewCount: 0,
+          mastered: false,
+          lastReviewedAt: null,
+        });
+        if (lib.length > 100) lib.length = 100;
+        saveErrorLib(lib);
+        renderErrorLib();
+      }
+
+      function deleteElEntry(id) {
+        if (!confirm('确定要删除这条错误记录吗？')) return;
+        saveErrorLib(loadErrorLib().filter(e => e.id !== id));
+        renderErrorLib();
+        showToast('已删除');
+      }
+
+      function toggleElMastered(id) {
+        const lib = loadErrorLib();
+        const entry = lib.find(e => e.id === id);
+        if (!entry) return;
+        entry.mastered = !entry.mastered;
+        saveErrorLib(lib);
+        renderErrorLib();
+        showToast(entry.mastered ? '已标记为掌握' : '已取消掌握');
+      }
+
+      function recordElReview(id) {
+        const lib = loadErrorLib();
+        const entry = lib.find(e => e.id === id);
+        if (!entry) return;
+        entry.reviewCount += 1;
+        entry.lastReviewedAt = Date.now();
+        saveErrorLib(lib);
+        renderErrorLib();
+        showToast(`已记录一次复习（共 ${entry.reviewCount} 次）`);
+      }
+
+      function getElFiltered() {
+        let lib = loadErrorLib();
+        if (elFilter === 'pending')  lib = lib.filter(e => !e.mastered);
+        if (elFilter === 'mastered') lib = lib.filter(e => e.mastered);
+        if (elSceneFilter !== 'all') lib = lib.filter(e => e.scenario === elSceneFilter);
+        return lib;
+      }
+
+      function renderElStats() {
+        const lib = loadErrorLib();
+        const total = lib.length;
+        const mastered = lib.filter(e => e.mastered).length;
+        elStatTotal.textContent = total;
+        elStatMastered.textContent = mastered;
+        elStatPending.textContent = total - mastered;
+        const tagCounts = {};
+        lib.forEach(e => (e.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+        let topTag = '-', topCount = 0;
+        for (const [tag, n] of Object.entries(tagCounts)) { if (n > topCount) { topTag = tag; topCount = n; } }
+        elStatTopTag.textContent = total ? topTag : '-';
+      }
+
+      function renderElProfile() {
+        const lib = loadErrorLib();
+        const tagCounts = {};
+        lib.forEach(e => (e.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+        const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        if (!sorted.length) { elProfile.style.display = 'none'; return; }
+        elProfile.style.display = 'block';
+        const maxCount = sorted[0][1];
+        elProfileList.innerHTML = sorted.map(([tag, count]) => `
+          <div class="el-profile-row">
+            <span class="el-profile-tag">${escapeHTML(tag)}</span>
+            <div class="el-profile-bar-wrap"><div class="el-profile-bar" style="width:${Math.round((count/maxCount)*100)}%"></div></div>
+            <span class="el-profile-count">${count}</span>
+          </div>`).join('');
+      }
+
+      function renderErrorLib() {
+        const lib = loadErrorLib();
+        const filtered = getElFiltered();
+        elCount.textContent = `${filtered.length} 条`;
+        renderElStats();
+        renderElProfile();
+
+        if (!lib.length) {
+          elList.innerHTML = '<div class="el-empty">你还没有保存错误。先纠正一句英文，再把它加入错误库。</div>';
+          return;
+        }
+        if (!filtered.length) {
+          elList.innerHTML = '<div class="el-empty">当前筛选下没有句子。</div>';
+          return;
+        }
+
+        elList.innerHTML = filtered.map(entry => `
+          <div class="el-item${entry.mastered ? ' mastered' : ''}">
+            <div class="el-item-original">${escapeHTML(entry.original)}</div>
+            <div class="el-item-corrected">${escapeHTML(entry.corrected)}</div>
+            ${entry.scenarioVersion && entry.scenarioVersion !== entry.corrected ? `<div class="el-item-scenario-v">🎯 场景最佳（${escapeHTML(entry.scenarioLabel)}）：${escapeHTML(entry.scenarioVersion)}</div>` : ''}
+            ${entry.natural && entry.natural !== entry.corrected && entry.natural !== entry.scenarioVersion ? `<div class="el-item-natural">💬 ${escapeHTML(entry.natural)}</div>` : ''}
+            ${entry.tags && entry.tags.length ? `<div class="el-item-tags">${entry.tags.map(t => `<span class="error-tag">${escapeHTML(t)}</span>`).join('')}</div>` : ''}
+            <div class="el-item-meta">
+              <span>🕐 ${timeAgo(entry.createdAt)}</span>
+              <span>📌 ${escapeHTML(entry.scenarioLabel)}</span>
+              ${entry.lastReviewedAt ? `<span>🔄 上次复习 ${timeAgo(entry.lastReviewedAt)}</span>` : ''}
+              <span>📖 复习 ${entry.reviewCount} 次</span>
+              ${entry.mastered ? '<span>✅ 已掌握</span>' : ''}
+            </div>
+            <div class="el-item-actions">
+              <button class="btn-sm" data-action="review" data-id="${entry.id}">🔄 复习一次</button>
+              <button class="btn-sm ${entry.mastered ? '' : 'success'}" data-action="master" data-id="${entry.id}">${entry.mastered ? '↩️ 取消掌握' : '✅ 标记掌握'}</button>
+              <button class="btn-sm danger" data-action="delete" data-id="${entry.id}">🗑 删除</button>
+            </div>
+          </div>`).join('');
+
+        elList.querySelectorAll('[data-action]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            if (btn.dataset.action === 'review') recordElReview(id);
+            if (btn.dataset.action === 'master') toggleElMastered(id);
+            if (btn.dataset.action === 'delete') deleteElEntry(id);
+          });
+        });
+      }
+
+      function clearErrorLib() {
+        if (!confirm('确定要清空所有错误库记录吗？此操作不可撤销。')) return;
+        saveErrorLib([]);
+        elFilter = 'all'; elSceneFilter = 'all';
+        updateElFilterUI();
+        renderErrorLib();
+        showToast('已清空错误库');
+      }
+
+      function scrollToReview() {
+        elFilter = 'pending';
+        updateElFilterUI();
+        renderErrorLib();
+        errorLibrary.scrollIntoView({ behavior: 'smooth' });
+      }
+
+      function updateElFilterUI() {
+        $$('#elFilterBar .pill[data-el-filter]').forEach(p => p.classList.toggle('active', p.dataset.elFilter === elFilter));
+        $$('#elFilterBar .pill[data-el-scene]').forEach(p => p.classList.toggle('active', p.dataset.elScene === elSceneFilter));
+      }
+
+      function updateScenarioUI() {
+        $$('#scenarioBar .scenario-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === selectedScenario));
+      }
+
+      // ═══════════ HERO / AI FIX ═══════════
+      function lookupDemo(userText) {
+        const key = userText.trim().toLowerCase();
+        return DEMO_RESULTS[key] || null;
+      }
+
+      async function runFix() {
+        const userText = heroTextarea.value.trim();
+        if (!userText) { showToast('请输入要分析的英文句子'); return; }
+
+        resultArea.classList.add('visible');
+        resultArea.innerHTML = '<div class="result-loading"><div class="spinner"></div> AI 正在分析中…</div>';
+        resultArea.scrollIntoView({ behavior: 'smooth' });
+
+        // 1) Try real API first
+        try {
+          const res = await fetch('/api/fix', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: userText, scenario: selectedScenario }),
+          });
+          const data = await res.json();
+          if (res.ok) { renderFixResult(data); return; }
+          // API returned an error — try demo fallback
+        } catch (_) { /* fetch failed — try demo fallback */ }
+
+        // 2) Demo fallback
+        const demo = lookupDemo(userText);
+        if (demo) {
+          renderFixResult(demo);
+          showToast('当前使用演示结果。配置 API Key 后可分析任意英文。');
+        } else {
+          resultArea.innerHTML = `
+            <div style="padding:24px 28px;">
+              <div class="result-error">
+                当前是公开演示模式。<br><br>
+                内置示例可以直接体验；<br>
+                自定义英文分析需要启动本地后端并配置 API Key（npm start），或等待未来桌面版。
+              </div>
+            </div>`;
+        }
+      }
+
+      function renderFixResult(data) {
+        const scenarioLabel = SCENARIOS[data.scenario] || data.scenario || '通用';
+        const altItems = (data.alternatives || []).map((alt, i) =>
+          `<li class="result-alt-item"><span class="result-alt-num">${i + 1}</span> ${escapeHTML(alt)}</li>`).join('');
+        const tagItems = (data.tags || []).map(t => `<span class="error-tag">${escapeHTML(t)}</span>`).join('');
+
+        const isSameScenario = !data.scenarioVersion || data.scenarioVersion === data.natural;
+        const finalExpr = data.scenarioVersion || data.natural || data.corrected;
+
+        resultArea.innerHTML = `
+          <div class="result-body">
+            <div class="result-scenario-badge">
+              📌 当前场景：${escapeHTML(scenarioLabel)}
+              ${data.demo ? ' <span style="background:var(--orange-light);color:var(--orange);padding:2px 8px;border-radius:var(--radius-pill);font-size:11px;margin-left:4px;">演示模式</span>' : ''}
+            </div>
+
+            <!-- Compare Card -->
+            <div class="compare-card">
+              <div class="compare-row">
+                <div class="compare-label bad">❌ 中式英文</div>
+                <div class="compare-value bad">${escapeHTML(data.original)}</div>
+              </div>
+              <div class="compare-row">
+                <div class="compare-label good">✅ 自然英文</div>
+                <div class="compare-value">${escapeHTML(data.natural)}</div>
+              </div>
+              ${!isSameScenario ? `
+              <div class="compare-row">
+                <div class="compare-label best">🎯 场景最佳表达（${escapeHTML(scenarioLabel)}）</div>
+                <div class="compare-value">${escapeHTML(data.scenarioVersion)}</div>
+              </div>
+              ` : ''}
+            </div>
+
+            <div class="result-row"><div class="result-row-label">✏️ 修正版</div><div class="result-row-value">${escapeHTML(data.corrected)}</div></div>
+            ${!isSameScenario ? `
+            <div class="result-row scenario-version"><div class="result-row-label">🎯 场景最佳表达（${escapeHTML(scenarioLabel)}）</div><div class="result-row-value">${escapeHTML(data.scenarioVersion)}</div></div>
+            ` : ''}
+            <div class="result-row explanation"><div class="result-row-label">📖 中文解释</div><div class="result-row-value">${escapeHTML(data.explanationZh || data.explanation || '')}</div></div>
+            ${altItems ? `<div class="result-row"><div class="result-row-label">🔄 替代表达</div><ul class="result-alt-list">${altItems}</ul></div>` : ''}
+            ${tagItems ? `<div class="result-row"><div class="result-row-label">🏷️ 错误标签</div><div class="result-tags">${tagItems}</div></div>` : ''}
+          </div>
+          <div class="result-footer">
+            <button class="btn-sm save" id="saveToLibBtn">💾 保存到错误库</button>
+            <button class="btn-sm" id="copyFinalBtn">📋 复制最终表达</button>
+            <button class="btn-sm" id="copyShareBtn">📣 复制分享文案</button>
+            <button class="btn-sm" id="retryBtn">🔄 重新分析</button>
+            <button class="btn-sm" id="newFixBtn">✏️ 分析新句子</button>
+          </div>
+        `;
+
+        $('#saveToLibBtn').addEventListener('click', () => {
+          addToErrorLib({
+            original: data.original,
+            corrected: data.corrected,
+            natural: data.natural,
+            scenarioVersion: data.scenarioVersion || data.natural,
+            explanationZh: data.explanationZh || data.explanation,
+            tags: data.tags || [],
+            scenario: data.scenario || selectedScenario,
+            scenarioLabel: scenarioLabel,
+          });
+          showToast('💾 已保存到错误库');
+        });
+
+        // Copy final expression
+        $('#copyFinalBtn').addEventListener('click', () => {
+          const expr = data.scenarioVersion || data.natural || data.corrected;
+          copyText(expr, '📋 已复制最终表达');
+        });
+
+        // Copy share text
+        $('#copyShareBtn').addEventListener('click', () => {
+          const expr = data.scenarioVersion || data.natural || data.corrected;
+          let shareText = `我用 SayRight 改了一句中式英文：\n\n❌ 原句：\n${data.original}\n\n✅ 自然表达：\n${data.natural}`;
+          if (data.scenarioVersion && data.scenarioVersion !== data.natural) {
+            shareText += `\n\n🎯 场景最佳表达（${scenarioLabel}）：\n${data.scenarioVersion}`;
+          }
+          shareText += `\n\nSayRight：把中式英文改成自然英文。`;
+          copyText(shareText, '📣 已复制分享文案');
+        });
+
+        $('#retryBtn').addEventListener('click', runFix);
+        $('#newFixBtn').addEventListener('click', () => {
+          resultArea.classList.remove('visible');
+          heroTextarea.value = '';
+          heroTextarea.focus();
+        });
+      }
+
+      // ═══════════ FAVORITES ═══════════
+      function loadFavorites()  { return lsGet(FAV_KEY, []); }
+      function saveFavorites(v) { lsSet(FAV_KEY, v); }
+      function isFaved(id)      { return loadFavorites().includes(id); }
+      function toggleFavorite(id) {
+        const favs = loadFavorites();
+        const idx = favs.indexOf(id);
+        if (idx > -1) favs.splice(idx, 1); else favs.push(id);
+        saveFavorites(favs);
+        return !favs.includes(id);
+      }
+
+      // ═══════════ MASTERED ═══════════
+      function loadMastered()  { return lsGet(MASTERED_KEY, []); }
+      function saveMastered(v) { lsSet(MASTERED_KEY, v); }
+      function isMastered(id)  { return loadMastered().includes(id); }
+      function toggleMastered(id) {
+        const list = loadMastered();
+        const idx = list.indexOf(id);
+        if (idx > -1) list.splice(idx, 1); else list.push(id);
+        saveMastered(list);
+        if (idx === -1) dailyAdd('mastered', id);
+        updateDailyStats();
+        return idx === -1;
+      }
+
+      // ═══════════ REVIEW LATER ═══════════
+      function loadReview()     { return lsGet(REVIEW_KEY, []); }
+      function saveReview(v)    { lsSet(REVIEW_KEY, v); }
+      function isReviewLater(id) { return loadReview().includes(id); }
+      function toggleReviewLater(id) {
+        const list = loadReview();
+        const idx = list.indexOf(id);
+        if (idx > -1) list.splice(idx, 1); else list.push(id);
+        saveReview(list);
+        if (idx === -1) dailyAdd('review', id);
+        updateDailyStats();
+        return idx === -1;
+      }
+
+      // ═══════════ DAILY STATS ═══════════
+      function todayKey() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      }
+      function loadDaily() {
+        const stored = lsGet(DAILY_KEY, {});
+        return stored.date === todayKey() ? stored : { date: todayKey(), browsed: [], mastered: [], review: [] };
+      }
+      function saveDaily(d) { lsSet(DAILY_KEY, d); }
+      function dailyAdd(field, id) {
+        const d = loadDaily();
+        if (!d[field].includes(id)) { d[field].push(id); saveDaily(d); }
+      }
+      function recordBrowse(id) {
+        const d = loadDaily();
+        if (!d.browsed.includes(id)) { d.browsed.push(id); saveDaily(d); }
+        updateDailyStats();
+      }
+      function updateDailyStats() {
+        const d = loadDaily();
+        statBrowsed.textContent  = d.browsed.length;
+        statMastered.textContent = d.mastered.length;
+        statReview.textContent   = loadReview().length;
+      }
+
+      // ═══════════ SENTENCE FILTERS ═══════════
+      function applyFilters() {
+        let d = allData;
+        if (currentLevel !== 'all') d = d.filter(item => item.level === currentLevel);
+        if (currentType !== 'all')  d = d.filter(item => item.type === currentType);
+        if (searchQuery.trim()) {
+          const q = searchQuery.trim().toLowerCase();
+          d = d.filter(item => item.en.toLowerCase().includes(q) || item.zh.includes(q));
+        }
+        if (reviewMode) d = d.filter(item => loadReview().includes(item.id));
+        filteredData = d; currentIndex = 0; renderCard();
+      }
+
+      function clearStatusTags() {
+        tagsEl.querySelectorAll('.tag-mastered, .tag-review').forEach(el => el.remove());
+      }
+
+      function renderCard() {
+        if (!filteredData.length) {
+          clearStatusTags();
+          tagLevel.textContent = '-'; tagType.textContent = '-';
+          progressText.textContent = '0 / 0';
+          favBtn.textContent = '🤍'; favBtn.classList.remove('faved');
+          masteredBtn.classList.remove('mastered'); reviewLaterBtn.classList.remove('review-later');
+          enText.textContent = reviewMode ? '复习列表为空' : '没有匹配的句子';
+          zhText.textContent = reviewMode ? '还没有需要复习的句子，先标记一些吧' : '试试调整筛选条件或搜索词';
+          return;
+        }
+        const item = filteredData[currentIndex];
+        clearStatusTags();
+        tagLevel.textContent = item.level; tagType.textContent = item.type;
+        if (isMastered(item.id)) {
+          const t = document.createElement('span'); t.className = 'tag tag-mastered'; t.textContent = '已掌握'; tagsEl.appendChild(t);
+        }
+        if (isReviewLater(item.id)) {
+          const t = document.createElement('span'); t.className = 'tag tag-review'; t.textContent = '待复习'; tagsEl.appendChild(t);
+        }
+        enText.textContent = item.en; zhText.textContent = item.zh;
+        progressText.textContent = `${currentIndex + 1} / ${filteredData.length}`;
+        if (isFaved(item.id)) { favBtn.textContent = '❤️'; favBtn.classList.add('faved'); }
+        else { favBtn.textContent = '🤍'; favBtn.classList.remove('faved'); }
+        masteredBtn.classList.toggle('mastered', isMastered(item.id));
+        reviewLaterBtn.classList.toggle('review-later', isReviewLater(item.id));
+        recordBrowse(item.id);
+      }
+
+      function updateFilterUI() {
+        $$('#levelBar .pill').forEach(p => p.classList.toggle('active', p.dataset.level === currentLevel));
+        $$('#typeBar .pill').forEach(p => p.classList.toggle('active', p.dataset.type === currentType));
+        reviewModeBtn.classList.toggle('review-active', reviewMode);
+      }
+
+      function setLevel(level) { currentLevel = level; reviewMode = false; updateFilterUI(); applyFilters(); }
+      function setType(type)   { currentType = type; reviewMode = false; updateFilterUI(); applyFilters(); }
+      function setReviewMode() {
+        reviewMode = !reviewMode;
+        if (reviewMode) { currentLevel = 'all'; currentType = 'all'; searchQuery = ''; searchInput.value = ''; }
+        updateFilterUI(); applyFilters();
+      }
+
+      function next() { if (!filteredData.length) return; currentIndex = (currentIndex + 1) % filteredData.length; renderCard(); }
+      function prev() { if (!filteredData.length) return; currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length; renderCard(); }
+      function goRandom() { if (!filteredData.length) return; currentIndex = Math.floor(Math.random() * filteredData.length); renderCard(); }
+
+      // ═══════════ FAV PANEL ═══════════
+      function renderFavPanel() {
+        const favIds = loadFavorites();
+        favCount.textContent = `${favIds.length} 条`; favList.innerHTML = '';
+        if (!favIds.length) { favEmpty.style.display = 'block'; return; }
+        favEmpty.style.display = 'none';
+        allData.filter(item => favIds.includes(item.id)).forEach(item => {
+          const li = document.createElement('li'); li.className = 'panel-item';
+          li.innerHTML = `<span class="en-mini">${escapeHTML(item.en)}</span><span class="zh-mini">${escapeHTML(item.zh)}</span><span class="tag tag-level" style="font-size:10px;padding:2px 8px;">${item.level}</span><button class="panel-remove" data-id="${item.id}" title="取消收藏">✕</button>`;
+          li.addEventListener('click', (e) => { if (e.target.closest('.panel-remove')) return; jumpToItem(item.id); });
+          favList.appendChild(li);
+        });
+        favList.querySelectorAll('.panel-remove').forEach(btn => {
+          btn.addEventListener('click', (e) => { e.stopPropagation(); toggleFavorite(parseInt(btn.dataset.id)); renderFavPanel(); renderCard(); showToast('已取消收藏'); });
+        });
+      }
+      function jumpToItem(id) {
+        reviewMode = false; updateFilterUI();
+        let idx = filteredData.findIndex(item => item.id === id);
+        if (idx === -1) { currentLevel = 'all'; currentType = 'all'; searchQuery = ''; searchInput.value = ''; updateFilterUI(); applyFilters(); idx = filteredData.findIndex(item => item.id === id); }
+        if (idx !== -1) { currentIndex = idx; renderCard(); favPanel.classList.remove('open'); }
+      }
+      function toggleFavPanel() {
+        const open = !favPanel.classList.contains('open');
+        if (open) { renderFavPanel(); favPanel.classList.add('open'); favPanel.scrollIntoView({ behavior: 'smooth' }); }
+        else favPanel.classList.remove('open');
+      }
+      function exportFavorites() {
+        const favIds = loadFavorites();
+        if (!favIds.length) { showToast('没有收藏可导出'); return; }
+        const items = allData.filter(item => favIds.includes(item.id));
+        const blob = new Blob([JSON.stringify(items, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'favorites.json'; a.click(); URL.revokeObjectURL(url);
+        showToast(`已导出 ${items.length} 条收藏`);
+      }
+      function clearFavorites() {
+        if (!confirm('确定要清空所有收藏吗？此操作不可撤销。')) return;
+        saveFavorites([]); renderFavPanel(); renderCard(); showToast('已清空所有收藏');
+      }
+
+      async function copyText(text, msg) {
+        try { await navigator.clipboard.writeText(text); }
+        catch {
+          const ta = document.createElement('textarea'); ta.value = text; ta.style.cssText = 'position:fixed;opacity:0';
+          document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+        }
+        showToast(msg || '✅ 已复制到剪贴板');
+      }
+
+      async function copyEnglish() {
+        if (!filteredData.length) return;
+        copyText(filteredData[currentIndex].en, '✅ 已复制到剪贴板');
+      }
+
+      async function load() {
+        try {
+          const res = await fetch('./data_db.json');
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          allData = await res.json();
+          if (!Array.isArray(allData) || !allData.length) throw new Error('Empty data');
+          errorBanner.style.display = 'none'; card.style.display = '';
+          updateDailyStats(); applyFilters();
+        } catch (err) {
+          console.error('Failed to load data_db.json:', err);
+          card.style.display = 'none'; errorBanner.style.display = 'block';
+        }
+      }
+
+      // ═══════════ EVENT BINDINGS ═══════════
+      const settingsPanel = $('#settingsPanel');
+      const roadmapSection = $('#roadmapSection');
+
+      $('#downloadBtn').addEventListener('click', () => showToast('桌面版正在开发中，当前可先使用网页版'));
+
+      // Settings
+      $('#settingsBtn').addEventListener('click', () => {
+        const open = !settingsPanel.classList.contains('open');
+        if (open) { settingsPanel.classList.add('open'); settingsPanel.scrollIntoView({ behavior: 'smooth' }); }
+        else settingsPanel.classList.remove('open');
+      });
+      $('#settingsCloseBtn').addEventListener('click', () => settingsPanel.classList.remove('open'));
+
+      // Support
+      $('#supportBtn').addEventListener('click', () => {
+        showToast('打赏入口准备中，后续会加入微信/支付宝/爱发电等方式');
+      });
+      $('#roadmapBtn').addEventListener('click', () => {
+        const visible = roadmapSection.style.display !== 'none';
+        roadmapSection.style.display = visible ? 'none' : 'block';
+        if (!visible) roadmapSection.scrollIntoView({ behavior: 'smooth' });
+      });
+
+      // Scenario selector
+      $('#scenarioBar').addEventListener('click', (e) => {
+        const btn = e.target.closest('.scenario-btn');
+        if (!btn) return;
+        selectedScenario = btn.dataset.scenario;
+        updateScenarioUI();
+      });
+
+      // Hero
+      heroFixBtn.addEventListener('click', runFix);
+      $('#heroReviewBtn').addEventListener('click', scrollToReview);
+      // Example toggle
+      $('#examplesToggle').addEventListener('click', () => {
+        const grid = $('#examplesGrid');
+        const open = grid.classList.toggle('open');
+        $('#examplesToggle').textContent = open ? '📋 常见中式英文示例 ▴' : '📋 常见中式英文示例 ▾';
+      });
+
+      // Scene-aware example buttons
+      document.querySelectorAll('.example-group-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          heroTextarea.value = btn.dataset.text;
+          if (btn.dataset.scene && SCENARIOS[btn.dataset.scene]) {
+            selectedScenario = btn.dataset.scene;
+            updateScenarioUI();
+          }
+          heroTextarea.focus();
+          heroTextarea.scrollIntoView({ behavior: 'smooth' });
+          showToast('已填入演示句子，点击开始纠错即可体验');
+        });
+      });
+
+      // Error lib filter
+      elFilterBar.addEventListener('click', (e) => {
+        const pill = e.target.closest('.pill');
+        if (!pill) return;
+        if (pill.dataset.elFilter !== undefined) {
+          elFilter = pill.dataset.elFilter;
+        }
+        if (pill.dataset.elScene !== undefined) {
+          elSceneFilter = pill.dataset.elScene;
+        }
+        updateElFilterUI();
+        renderErrorLib();
+      });
+
+      $('#elClearBtn').addEventListener('click', clearErrorLib);
+
+      $('#levelBar').addEventListener('click', (e) => { const p = e.target.closest('.pill'); if (p) setLevel(p.dataset.level); });
+      $('#typeBar').addEventListener('click', (e) => { const p = e.target.closest('.pill'); if (p) setType(p.dataset.type); });
+      $('#prevBtn').addEventListener('click', prev);
+      $('#nextBtn').addEventListener('click', next);
+      $('#randomBtn').addEventListener('click', goRandom);
+      $('#copyBtn').addEventListener('click', copyEnglish);
+      $('#reviewModeBtn').addEventListener('click', setReviewMode);
+      $('#masteredBtn').addEventListener('click', () => { if (!filteredData.length) return; const added = toggleMastered(filteredData[currentIndex].id); renderCard(); showToast(added ? '✅ 已标记为掌握' : '已取消掌握标记'); });
+      $('#reviewLaterBtn').addEventListener('click', () => { if (!filteredData.length) return; const added = toggleReviewLater(filteredData[currentIndex].id); renderCard(); showToast(added ? '📝 已加入复习列表' : '已移出复习列表'); });
+      $('#favBtn').addEventListener('click', () => { if (!filteredData.length) return; const added = toggleFavorite(filteredData[currentIndex].id); renderCard(); showToast(added ? '❤️ 已收藏' : '已取消收藏'); if (favPanel.classList.contains('open')) renderFavPanel(); });
+      $('#favToggleBtn').addEventListener('click', toggleFavPanel);
+      $('#favCloseBtn').addEventListener('click', () => favPanel.classList.remove('open'));
+      $('#favExportBtn').addEventListener('click', exportFavorites);
+      $('#favClearBtn').addEventListener('click', clearFavorites);
+
+      let searchTimer = null;
+      searchInput.addEventListener('input', () => { clearTimeout(searchTimer); searchTimer = setTimeout(() => { searchQuery = searchInput.value; applyFilters(); }, 250); });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); next(); }
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   { e.preventDefault(); prev(); }
+        if (e.key === 'r' || e.key === 'R') { e.preventDefault(); goRandom(); }
+      });
+      heroTextarea.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runFix(); } });
+
+      updateDailyStats();
+      renderErrorLib();
+      load();
+    })();
+  </script>
+</body>
+</html>
