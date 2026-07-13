@@ -96,9 +96,14 @@
     .example-group { margin-bottom: 12px; }
     .example-group:last-child { margin-bottom: 0; }
     .example-group-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 5px; }
-    .example-group-btns { display: flex; gap: 5px; flex-wrap: wrap; }
-    .example-group-btn { font-size: 12px; padding: 4px 12px; border-radius: var(--radius-pill); border: 1px dashed var(--border); background: var(--card); color: var(--text-secondary); cursor: pointer; transition: all 0.15s ease; white-space: nowrap; font-family: inherit; }
-    .example-group-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .example-group-btns { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px; }
+    .example-group-btn { text-align: left; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--card); color: var(--text); cursor: pointer; transition: all 0.15s ease; font-family: inherit; box-shadow: var(--shadow); min-width: 0; }
+    .example-group-btn:hover { border-color: var(--accent); background: #fbfcff; transform: translateY(-1px); }
+    .example-card-original { font-size: 13px; font-weight: 700; line-height: 1.45; overflow-wrap: anywhere; }
+    .example-card-natural { margin-top: 6px; font-size: 12px; color: var(--text-secondary); line-height: 1.45; overflow-wrap: anywhere; }
+    .example-card-meta { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+    .example-card-tag { font-size: 10px; font-weight: 700; color: var(--accent); background: var(--accent-light); border-radius: var(--radius-pill); padding: 2px 8px; }
+    .example-card-tag.muted { color: var(--text-secondary); background: #f3f4f6; }
     .example-group-btn.hidden { display: none; }
     .example-group.hidden { display: none; }
 
@@ -123,17 +128,22 @@
     .result-loading { text-align: center; padding: 40px 24px; color: var(--text-secondary); font-size: 15px; }
     .spinner { display: inline-block; width: 24px; height: 24px; border: 2.5px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .result-body { padding: 28px 28px 20px; display: flex; flex-direction: column; gap: 18px; }
+    .result-body { padding: 28px 28px 20px; display: flex; flex-direction: column; gap: 14px; }
     .result-scenario-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--accent-light); padding: 6px 14px; border-radius: var(--radius-pill); align-self: flex-start; }
-    .result-original { font-size: 15px; color: var(--text-secondary); padding: 10px 16px; background: #f8f9fa; border-radius: var(--radius-sm); border-left: 3px solid var(--accent); }
-    .result-row { background: #f8f9fa; border-radius: var(--radius-sm); padding: 16px; }
-    .result-row-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--accent); margin-bottom: 8px; }
-    .result-row-value { font-size: 17px; font-weight: 500; color: var(--text); line-height: 1.5; }
+    .result-grid { display: grid; gap: 12px; }
+    .result-row { background: #fbfcff; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px; min-width: 0; overflow-wrap: anywhere; }
+    .result-row.hero-result { background: #f7f8ff; border-color: #c7d2fe; }
+    .result-row.hero-result .result-row-value { font-size: 20px; font-weight: 800; color: var(--text); }
+    .result-row.secondary-result { background: #fcfcff; }
+    .result-row.muted-result { background: #fafafa; color: var(--text-secondary); }
+    .result-row-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px; }
+    .result-row-label { display: grid; gap: 2px; }
+    .result-label-zh { font-size: 15px; font-weight: 800; color: var(--text); }
+    .result-label-en { font-size: 11px; font-weight: 700; color: #9ca3af; }
+    .result-row-value { font-size: 16px; font-weight: 500; color: var(--text); line-height: 1.65; white-space: pre-wrap; }
     .result-row.explanation .result-row-value { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
-    .result-row.scenario-version .result-row-value { font-size: 17px; font-weight: 600; color: var(--accent); }
-    .result-alt-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-    .result-alt-item { font-size: 15px; color: var(--text); padding: 8px 14px; background: #fff; border: 1px solid var(--border); border-radius: var(--radius-pill); display: flex; align-items: center; gap: 8px; }
-    .result-alt-num { font-size: 11px; font-weight: 700; color: var(--accent); background: var(--accent-light); width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .result-alt-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; }
+    .result-alt-item { font-size: 15px; color: var(--text); line-height: 1.5; overflow-wrap: anywhere; }
     .result-error { text-align: center; padding: 24px 16px; color: #991b1b; font-size: 14px; background: var(--red-light); border-radius: var(--radius-sm); margin: 0 28px 20px; }
     .result-tags { display: flex; gap: 8px; flex-wrap: wrap; }
     .result-footer { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 28px 24px; }
@@ -423,7 +433,6 @@
         <div class="logo">Say<span>Right</span></div>
         <div class="subtitle">把中式英文改成自然英文</div>
       </div>
-      <button class="btn" id="settingsBtn">⚙️ 设置</button>
       <button class="btn" id="downloadBtn">下载桌面版</button>
     </div>
 
@@ -456,16 +465,16 @@
       </div>
 
       <div class="hero-actions">
-        <button class="btn primary" id="heroFixBtn">✨ 开始纠错</button>
+        <button class="btn primary" id="heroFixBtn">✨ 查看演示结果</button>
         <button class="btn" id="heroReviewBtn">📚 复习我的错误</button>
       </div>
       <p class="hero-desc">
-        <span style="font-weight:600;color:var(--text);">别再写中式英文了。</span>输入一句英文，SayRight 帮你改成自然、礼貌、符合场景的表达。Ctrl+Enter 快速发送。
+        <span style="font-weight:600;color:var(--text);">别再写中式英文了。</span>点击内置示例，SayRight 会展示自然、礼貌、符合场景的预设纠错结果。
       </p>
 
       <!-- Demo Notice -->
       <div class="demo-notice">
-        💡 当前网页版支持演示模式：点击内置示例即可体验。自定义英文分析需要本地后端（<code>npm start</code>）或未来桌面版。
+        💡 公开演示版只使用本地预设结果，不请求真实 AI、不需要 API Key、不上传用户数据。自定义句子请使用 SayRight Desktop。
       </div>
 
       <!-- Quick Start -->
@@ -478,7 +487,7 @@
           </div>
           <div class="quick-step">
             <div class="quick-step-num">2</div>
-            <p>点击「开始纠错」</p>
+            <p>立即查看结构化演示结果</p>
           </div>
           <div class="quick-step">
             <div class="quick-step-num">3</div>
@@ -489,7 +498,7 @@
 
       <!-- Chinglish Examples -->
       <div class="examples-section" id="examples">
-        <span class="examples-toggle" id="examplesToggle">📋 常见中式英文示例（已收录 50 条）▾</span>
+        <span class="examples-toggle" id="examplesToggle">📋 常见中式英文示例（已收录 53 条）▾</span>
         <p style="font-size:11px;color:#adb5bd;margin:4px 0 6px 0;">覆盖中式表达、介词错误、语气生硬、邮件不礼貌、简历太弱、技术表达不清楚等高频问题</p>
 
         <!-- Example Search & Filters -->
@@ -816,14 +825,14 @@
         <li>导出 JSON、导入 JSON、学习报告生成全部在本地浏览器完成。</li>
         <li>公开演示模式不会把示例体验内容上传到任何地方。</li>
       </ul>
-      <p style="font-size:12px;margin-top:8px;">⚠️ 真实 AI 模式下，自定义英文会通过本地后端发送给配置的 AI 服务（如 DeepSeek），因此不建议在自定义句子中输入高度敏感的隐私内容。</p>
+      <p style="font-size:12px;margin-top:8px;">⚠️ 公开演示版不会分析自定义英文。需要真实纠错时，请使用 SayRight Desktop，并自行确认要发送给 AI 服务的内容不含高度敏感隐私。</p>
     </section>
 
     <!-- ═══════════ LIMITATIONS ═══════════ -->
     <section class="info-section">
       <h2>📌 当前版本限制</h2>
       <ul>
-        <li>公开演示版只覆盖内置的 53 条示例，自定义英文需要本地后端和 API Key。</li>
+        <li>公开演示版只覆盖内置的 53 条示例，自定义英文请使用 SayRight Desktop 并配置自己的 DeepSeek API Key。</li>
         <li>当前没有账号同步，不同设备间的错误库需要通过导出/导入手动迁移。</li>
         <li>桌面端 App、浏览器插件和手机端仍在计划中，目前仅提供网页版。</li>
         <li>AI 分析结果仅供参考，正式邮件、学术论文和合同等场景建议人工复核。</li>
@@ -836,7 +845,7 @@
       <h2>❓ 常见问题</h2>
       <div class="faq-item">
         <div class="faq-q">这是免费的吗？</div>
-        <div class="faq-a">当前公开演示版可以免费体验 53 条内置示例，无需任何配置。真实 AI 分析需要在 .env 中配置自己的 DeepSeek API Key。未来桌面版会支持用户在设置界面填写自己的 API Key，不依赖运营方承担 AI 成本。</div>
+        <div class="faq-a">当前公开演示版可以免费体验 53 条内置示例，无需任何配置。自定义英文分析请使用 SayRight Desktop，并配置自己的 DeepSeek API Key。</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">为什么不直接用 ChatGPT？</div>
@@ -844,11 +853,11 @@
       </div>
       <div class="faq-item">
         <div class="faq-q">我的句子会被上传吗？</div>
-        <div class="faq-a">公开演示模式下，内置示例的体验内容完全在本地浏览器运行，不会上传。真实 AI 模式下，你输入的自定义句子会通过本地后端（server.js）发送给你配置的 AI 服务（如 DeepSeek），请参考对应 AI 服务的隐私政策。当前 SayRight 本身没有服务器数据库，错误库只保存在你的浏览器本地。</div>
+        <div class="faq-a">公开演示模式下，内置示例的体验内容完全在本地浏览器运行，不会上传。当前 SayRight 公开站没有服务器数据库，错误库只保存在你的浏览器本地。</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">为什么自定义句子不能在公开网页里直接分析？</div>
-        <div class="faq-a">因为公开网页没有后端和 API Key。如果直接在前端调用 AI 接口，API Key 会暴露，且会产生无法控制的调用成本。后续桌面版会解决这个问题——用户在自己的 App 里填写自己的 Key，调用的是自己的额度。</div>
+        <div class="faq-a">因为公开网页没有后端，也不会收集或保存 API Key。直接在前端调用 AI 接口会暴露 Key，并产生不可控成本。桌面版会让用户在自己的 App 里填写自己的 Key，调用自己的额度。</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">错误库会不会丢？</div>
@@ -931,44 +940,6 @@
       </div>
       <ul class="panel-list" id="favList"></ul>
       <div class="panel-empty" id="favEmpty" style="display:none;">还没有收藏任何句子</div>
-    </div>
-
-    <!-- Settings Panel -->
-    <div class="panel" id="settingsPanel">
-      <div class="panel-header">
-        <h2>⚙️ 设置</h2>
-        <span class="spacer"></span>
-        <button class="btn-sm" id="settingsCloseBtn">关闭</button>
-      </div>
-      <div class="settings-body">
-        <div class="settings-card">
-          <h3>API Key 说明 <span class="settings-badge active">当前可用</span></h3>
-          <p>当前默认使用本地后端 <code>.env</code> 中配置的 DeepSeek API Key。所有 AI 请求通过本地服务器转发，API Key 不会暴露给前端。</p>
-          <p style="font-size:12px;color:#adb5bd;">如果你自己部署此项目，需要在项目根目录创建 <code>.env</code> 文件并填写 <code>DEEPSEEK_API_KEY=你的Key</code>。</p>
-        </div>
-        <div class="settings-card">
-          <h3>自带 DeepSeek API Key <span class="settings-badge" id="apiKeyBadge">演示模式</span></h3>
-          <p>本地运行版支持使用你自己的 DeepSeek API Key。Key 保存在当前浏览器 localStorage 中，仅发送给本地后端（<code>localhost</code>），不上传到任何云端服务器。</p>
-          <p style="font-size:11px;color:#adb5bd;margin:0 0 6px;"><code>.env</code> 中的 <code>DEEPSEEK_API_KEY</code> 仅为开发者本地调试 fallback，普通用户不需要创建 <code>.env</code> 文件。</p>
-          <div class="settings-key-row">
-            <input class="settings-key-input" type="password" id="apiKeyInput" placeholder="sk-..." />
-            <button class="btn-sm" id="apiKeyToggleBtn">👁</button>
-          </div>
-          <div class="settings-key-status" id="apiKeyStatus"></div>
-          <div style="font-size:12px;margin-top:6px;color:var(--accent);" id="apiKeyMode"></div>
-          <div class="settings-key-row" style="margin-top:10px;">
-            <button class="btn-sm save" id="apiKeySaveBtn">💾 保存 Key</button>
-            <button class="btn-sm" id="apiKeyTestBtn">🔍 测试连接</button>
-            <button class="btn-sm danger" id="apiKeyClearBtn">清除网页保存的 Key</button>
-          </div>
-          <p style="font-size:11px;color:#adb5bd;margin-top:10px;" id="apiKeyWarning">⚠️ 安全提示：请只在你信任的本地运行版（localhost）中填写 API Key。公开网页中输入任何 API Key 都存在风险。</p>
-        </div>
-        <div class="settings-card">
-          <h3>公开演示版 <span class="settings-badge active">v1.0</span></h3>
-          <p>当前 SayRight 以公开演示版形式发布。内置示例可直接体验纠错效果，无需任何配置。自定义英文需要真实 AI 模式（在 <code>.env</code> 中配置 <code>DEEPSEEK_API_KEY</code>）。未来桌面版将支持用户自带 API Key，无门槛使用完整功能。</p>
-          <p style="font-size:12px;color:var(--accent);">公开演示地址：https://loyel-stone.github.io/sayright-demo/</p>
-        </div>
-      </div>
     </div>
 
     <footer class="about">
@@ -1109,7 +1080,7 @@
         };
         Object.entries(_extra).forEach(([k, v]) => { EXAMPLE_TAGS[k] = v; });
       };
-      setTimeout(_exInit, 100); // run after DOM is ready
+      _exInit();
 
       // ═══════════ DEMO RESULTS ═══════════
       // Preset corrections for 18 common Chinglish examples so the tool
@@ -2101,84 +2072,49 @@
         if (!userText) { showToast('请输入要分析的英文句子'); return; }
 
         resultArea.classList.add('visible');
-        resultArea.innerHTML = '<div class="result-loading"><div class="spinner"></div> AI 正在分析中…</div>';
         resultArea.scrollIntoView({ behavior: 'smooth' });
 
-        // 1) Try real API first
-        try {
-          const res = await fetch('/api/fix', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: userText, scenario: selectedScenario, userApiKey: getUserApiKey() || undefined }),
-          });
-          const data = await res.json();
-          if (res.ok) { renderFixResult(data); return; }
-          // API returned an error — try demo fallback
-        } catch (_) { /* fetch failed — try demo fallback */ }
-
-        // 2) Demo fallback
         const demo = lookupDemo(userText);
         if (demo) {
           renderFixResult(demo);
-          showToast('当前使用演示结果。配置 API Key 后可分析任意英文。');
+          showToast('已显示演示结果');
         } else {
-          const noBackendMsg = isLocalhost
-            ? '当前未连接 AI 服务。<br><br>你可以在 <a href="#" onclick="document.getElementById(\'settingsBtn\').click();return false" style="color:var(--accent);">设置</a> 中填写自己的 DeepSeek API Key，或继续使用内置示例体验演示模式。<br><br>如果刚启动了 npm start，请确认服务在 http://localhost:3000 运行。'
-            : '当前是公开演示版，不建议在公开页面输入真实 API Key。<br><br>建议下载项目后在本地运行版（npm start + localhost:3000）使用自带 Key。内置示例可直接体验演示模式。';
           resultArea.innerHTML = `
             <div style="padding:24px 28px;">
-              <div class="result-error">${noBackendMsg}</div>
+              <div class="result-error">公开演示版仅支持内置示例。自定义句子请使用 SayRight Desktop，并配置自己的 DeepSeek API Key。</div>
             </div>`;
         }
       }
 
       function renderFixResult(data) {
+        const normalized = normalizeResult(data);
         const scenarioLabel = SCENARIOS[data.scenario] || data.scenario || '通用';
         const altItems = (data.alternatives || []).map((alt, i) =>
-          `<li class="result-alt-item"><span class="result-alt-num">${i + 1}</span> ${escapeHTML(alt)}</li>`).join('');
+          `<li class="result-alt-item">${escapeHTML(alt)}</li>`).join('');
         const tagItems = (data.tags || []).map(t => `<span class="error-tag">${escapeHTML(t)}</span>`).join('');
-
-        const isSameScenario = !data.scenarioVersion || data.scenarioVersion === data.natural;
-        const finalExpr = data.scenarioVersion || data.natural || data.corrected;
 
         resultArea.innerHTML = `
           <div class="result-body">
             <div class="result-scenario-badge">
               📌 当前场景：${escapeHTML(scenarioLabel)}
-              ${data.demo ? ' <span style="background:var(--orange-light);color:var(--orange);padding:2px 8px;border-radius:var(--radius-pill);font-size:11px;margin-left:4px;">演示模式</span>' : ''}
+              <span style="background:var(--orange-light);color:var(--orange);padding:2px 8px;border-radius:var(--radius-pill);font-size:11px;margin-left:4px;">演示结果</span>
             </div>
-
-            <!-- Compare Card -->
-            <div class="compare-card">
-              <div class="compare-row">
-                <div class="compare-label bad">❌ 中式英文</div>
-                <div class="compare-value bad">${escapeHTML(data.original)}</div>
+            <div class="result-grid">
+              ${renderResultBlock('自然表达', 'Natural', normalized.natural, 'copy-natural', '复制自然表达', 'result-row hero-result')}
+              ${renderResultBlock('场景表达', `Scenario Version · ${scenarioLabel}`, normalized.scenarioVersion, 'copy-scenario', '复制场景表达', 'result-row hero-result')}
+              ${renderResultBlock('语法修正', 'Corrected', normalized.corrected, 'copy-corrected', '复制语法修正', 'result-row secondary-result')}
+              ${renderResultBlock('中文解释', 'Chinese Explanation', normalized.explanationZh, '', '', 'result-row explanation secondary-result')}
+              ${altItems ? renderResultBlock('替代表达', 'Alternatives', `<ol class="result-alt-list">${altItems}</ol>`, 'copy-alternatives', '复制替代表达', 'result-row', true) : ''}
+              <div class="result-row">
+                <div class="result-row-head">${renderResultLabel('错误标签', 'Error Tags')}</div>
+                <div class="result-tags">${tagItems || '<span class="result-row-value">暂无标签</span>'}</div>
               </div>
-              <div class="compare-row">
-                <div class="compare-label good">✅ 自然英文</div>
-                <div class="compare-value">${escapeHTML(data.natural)}</div>
-              </div>
-              ${!isSameScenario ? `
-              <div class="compare-row">
-                <div class="compare-label best">🎯 场景最佳表达（${escapeHTML(scenarioLabel)}）</div>
-                <div class="compare-value">${escapeHTML(data.scenarioVersion)}</div>
-              </div>
-              ` : ''}
+              ${renderResultBlock('原句', 'Original', normalized.original, '', '', 'result-row muted-result')}
             </div>
-
-            <div class="result-row"><div class="result-row-label">✏️ 修正版</div><div class="result-row-value">${escapeHTML(data.corrected)}</div></div>
-            ${!isSameScenario ? `
-            <div class="result-row scenario-version"><div class="result-row-label">🎯 场景最佳表达（${escapeHTML(scenarioLabel)}）</div><div class="result-row-value">${escapeHTML(data.scenarioVersion)}</div></div>
-            ` : ''}
-            <div class="result-row explanation"><div class="result-row-label">📖 中文解释</div><div class="result-row-value">${escapeHTML(data.explanationZh || data.explanation || '')}</div></div>
-            ${altItems ? `<div class="result-row"><div class="result-row-label">🔄 替代表达</div><ul class="result-alt-list">${altItems}</ul></div>` : ''}
-            ${tagItems ? `<div class="result-row"><div class="result-row-label">🏷️ 错误标签</div><div class="result-tags">${tagItems}</div></div>` : ''}
           </div>
           <div class="result-footer">
             <button class="btn-sm save" id="saveToLibBtn">💾 保存到错误库</button>
-            <button class="btn-sm" id="copyFinalBtn">📋 复制最终表达</button>
-            <button class="btn-sm" id="copyShareBtn">📣 复制分享文案</button>
-            <button class="btn-sm" id="retryBtn">🔄 重新分析</button>
+            <button class="btn-sm" id="copyFullBtn">📋 复制完整结果</button>
             <button class="btn-sm" id="newFixBtn">✏️ 分析新句子</button>
           </div>
         `;
@@ -2197,29 +2133,60 @@
           showToast('💾 已保存到错误库');
         });
 
-        // Copy final expression
-        $('#copyFinalBtn').addEventListener('click', () => {
-          const expr = data.scenarioVersion || data.natural || data.corrected;
-          copyText(expr, '📋 已复制最终表达');
+        resultArea.querySelectorAll('[data-result-action]').forEach(button => {
+          button.addEventListener('click', () => handleResultCopy(button.dataset.resultAction, normalized));
         });
 
-        // Copy share text
-        $('#copyShareBtn').addEventListener('click', () => {
-          const expr = data.scenarioVersion || data.natural || data.corrected;
-          let shareText = `我用 SayRight 改了一句中式英文：\n\n❌ 原句：\n${data.original}\n\n✅ 自然表达：\n${data.natural}`;
-          if (data.scenarioVersion && data.scenarioVersion !== data.natural) {
-            shareText += `\n\n🎯 场景最佳表达（${scenarioLabel}）：\n${data.scenarioVersion}`;
-          }
-          shareText += `\n\nSayRight：把中式英文改成自然英文。`;
-          copyText(shareText, '📣 已复制分享文案');
-        });
-
-        $('#retryBtn').addEventListener('click', runFix);
+        $('#copyFullBtn').addEventListener('click', () => copyText(formatResult(normalized), '已复制完整结果'));
         $('#newFixBtn').addEventListener('click', () => {
           resultArea.classList.remove('visible');
           heroTextarea.value = '';
           heroTextarea.focus();
         });
+      }
+
+      function normalizeResult(result) {
+        return {
+          original: result.original || '',
+          corrected: result.corrected || result.original || '',
+          natural: result.natural || result.corrected || result.original || '',
+          scenarioVersion: result.scenarioVersion || result.natural || result.corrected || '',
+          explanationZh: result.explanationZh || result.explanation || '',
+          alternatives: Array.isArray(result.alternatives) ? result.alternatives.slice(0, 4) : [],
+          tags: Array.isArray(result.tags) ? result.tags.slice(0, 8) : [],
+          scenario: result.scenario || selectedScenario,
+        };
+      }
+
+      function renderResultLabel(zh, en) {
+        return `<div class="result-row-label"><span class="result-label-zh">${escapeHTML(zh)}</span><span class="result-label-en">${escapeHTML(en)}</span></div>`;
+      }
+
+      function renderResultBlock(zh, en, value, action, buttonText, className, allowHtml = false) {
+        const content = allowHtml ? value : escapeHTML(value || '');
+        const copyButton = action ? `<button type="button" class="btn-sm" data-result-action="${action}">${escapeHTML(buttonText)}</button>` : '';
+        return `<div class="${className}"><div class="result-row-head">${renderResultLabel(zh, en)}${copyButton}</div><div class="result-row-value">${content}</div></div>`;
+      }
+
+      function handleResultCopy(action, result) {
+        if (action === 'copy-corrected') copyText(result.corrected, '已复制语法修正');
+        if (action === 'copy-natural') copyText(result.natural, '已复制自然表达');
+        if (action === 'copy-scenario') copyText(result.scenarioVersion, '已复制场景表达');
+        if (action === 'copy-alternatives') copyText(result.alternatives.join('\n'), '已复制替代表达');
+      }
+
+      function formatResult(result) {
+        const scenarioLabel = SCENARIOS[result.scenario] || result.scenario || '通用';
+        return [
+          `原句 / Original：${result.original}`,
+          `语法修正 / Corrected：${result.corrected}`,
+          `自然表达 / Natural：${result.natural}`,
+          `场景表达 / Scenario Version：${result.scenarioVersion}`,
+          `中文解释 / Chinese Explanation：${result.explanationZh}`,
+          `替代表达 / Alternatives：${result.alternatives.join(' | ') || '-'}`,
+          `错误标签 / Error Tags：${result.tags.join('、') || '-'}`,
+          `场景 / Scenario：${scenarioLabel}`,
+        ].join('\n');
       }
 
       // ═══════════ FAVORITES ═══════════
@@ -2422,141 +2389,9 @@
       }
 
       // ═══════════ EVENT BINDINGS ═══════════
-      const settingsPanel = $('#settingsPanel');
       const roadmapSection = $('#roadmapSection');
 
-      $('#downloadBtn').addEventListener('click', () => showToast('桌面版正在开发中，当前可先使用网页版'));
-
-      // Settings
-      $('#settingsBtn').addEventListener('click', () => {
-        const open = !settingsPanel.classList.contains('open');
-        if (open) { settingsPanel.classList.add('open'); settingsPanel.scrollIntoView({ behavior: 'smooth' }); }
-        else settingsPanel.classList.remove('open');
-      });
-      $('#settingsCloseBtn').addEventListener('click', () => settingsPanel.classList.remove('open'));
-
-      // ═══════════ USER API KEY MANAGEMENT ═══════════
-      const USER_KEY_LS = 'sayright_user_api_key';
-      const isLocalhost = /^(localhost|127\.0\.0\.1)(:\d+)?$/.test(window.location.hostname);
-
-      function getUserApiKey() { return (localStorage.getItem(USER_KEY_LS) || '').trim(); }
-      function saveUserApiKey(key) { localStorage.setItem(USER_KEY_LS, key.trim()); }
-      function clearUserApiKeyLS() { localStorage.removeItem(USER_KEY_LS); }
-      function maskApiKey(key) {
-        if (!key || key.length < 12) return '未配置';
-        return key.slice(0, 5) + '****' + key.slice(-4);
-      }
-
-      async function updateApiKeyStatus() {
-        const key = getUserApiKey();
-        const badge = $('#apiKeyBadge');
-        const status = $('#apiKeyStatus');
-        const mode = $('#apiKeyMode');
-        const warning = $('#apiKeyWarning');
-
-        // GitHub Pages warning
-        if (!isLocalhost) {
-          warning.innerHTML = '⚠️ 当前是公开 GitHub Pages 演示版。为了安全，<b>不建议</b>在这里输入真实 API Key。建议下载项目后在本地 localhost 运行版中使用自带 Key。';
-        } else {
-          warning.innerHTML = '⚠️ 安全提示：请只在你信任的本地运行版中填写 API Key。当前是本地运行版，可以使用自带 API Key。';
-        }
-
-        if (key) {
-          // State 1: User saved key
-          badge.textContent = '用户自带 Key';
-          badge.className = 'settings-badge ok';
-          status.innerHTML = `<span style="color:var(--green);">已配置：${maskApiKey(key)}</span>`;
-          mode.innerHTML = '当前 AI 模式：<b>用户自带 Key</b>（优先使用）';
-          $('#apiKeyInput').value = key;
-        } else {
-          $('#apiKeyInput').value = '';
-          // Query backend for .env key existence
-          try {
-            const res = await fetch('/api/key-status');
-            const data = await res.json();
-            if (data.hasEnvKey) {
-              // State 2: .env fallback
-              badge.textContent = '.env Key';
-              badge.className = 'settings-badge ok';
-              status.innerHTML = '<span style="color:var(--accent);">检测到开发者 .env Key</span>';
-              mode.innerHTML = '当前 AI 模式：<b>开发者 .env Key</b>（仅作调试 fallback）。清除网页保存的 Key 不会删除 .env。';
-            } else {
-              // State 3: Demo mode
-              badge.textContent = '演示模式';
-              badge.className = 'settings-badge';
-              status.textContent = '';
-              mode.innerHTML = '当前 AI 模式：<b>演示模式</b>（仅可体验内置示例）';
-            }
-          } catch (_) {
-            // /api/key-status failed (e.g. GitHub Pages) — assume demo mode
-            badge.textContent = '演示模式';
-            badge.className = 'settings-badge';
-            status.textContent = '';
-            mode.innerHTML = '当前 AI 模式：<b>演示模式</b>（仅可体验内置示例）';
-          }
-        }
-      }
-
-      // Toggle password visibility
-      let apiKeyVisible = false;
-      $('#apiKeyToggleBtn').addEventListener('click', () => {
-        apiKeyVisible = !apiKeyVisible;
-        $('#apiKeyInput').type = apiKeyVisible ? 'text' : 'password';
-        $('#apiKeyToggleBtn').textContent = apiKeyVisible ? '🙈' : '👁';
-      });
-
-      // Save key
-      $('#apiKeySaveBtn').addEventListener('click', () => {
-        const input = $('#apiKeyInput').value.trim();
-        if (!input) { showToast('请先输入 API Key。'); return; }
-        if (!input.startsWith('sk-')) { showToast('API Key 格式可能不正确（应以 sk- 开头），请检查。'); }
-        saveUserApiKey(input);
-        updateApiKeyStatus();
-        showToast('API Key 已保存到本地浏览器。');
-      });
-
-      // Clear key
-      $('#apiKeyClearBtn').addEventListener('click', () => {
-        if (!confirm('确定要清除网页保存的 API Key 吗？')) return;
-        clearUserApiKeyLS();
-        updateApiKeyStatus();
-        showToast('网页保存的 API Key 已清除。如果本地 .env 中仍有 Key，真实 AI 模式仍可使用。');
-      });
-
-      // Test key (only tests user-provided key, not .env)
-      async function testApiKey() {
-        let key = $('#apiKeyInput').value.trim();
-        if (!key) key = getUserApiKey();
-        if (!key) { showToast('请先输入或保存你的 DeepSeek API Key。'); return; }
-
-        const testBtn = $('#apiKeyTestBtn');
-        testBtn.textContent = '⏳ 测试中…';
-        testBtn.disabled = true;
-        try {
-          const res = await fetch('/api/test-key', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userApiKey: key }),
-          });
-          const data = await res.json();
-          if (data.ok) {
-            $('#apiKeyStatus').innerHTML = '<span style="color:var(--green);">✅ 测试成功 — API Key 可用。</span>';
-            showToast('API Key 测试成功。');
-          } else {
-            $('#apiKeyStatus').innerHTML = `<span style="color:var(--red);">❌ ${data.message}</span>`;
-            showToast('API Key 测试失败，请检查 Key 或余额。');
-          }
-        } catch (_) {
-          $('#apiKeyStatus').innerHTML = '<span style="color:var(--red);">❌ 无法连接到后端，请确认 npm start 已启动。</span>';
-          showToast('无法连接到后端。');
-        }
-        testBtn.textContent = '🔍 测试连接';
-        testBtn.disabled = false;
-      }
-      $('#apiKeyTestBtn').addEventListener('click', testApiKey);
-
-      // Init key status
-      updateApiKeyStatus();
+      $('#downloadBtn').addEventListener('click', () => showToast('桌面版请从 SayRight Desktop 项目获取；公开站仅提供静态演示。'));
 
       // Support
       $('#supportBtn').addEventListener('click', () => {
@@ -2712,8 +2547,27 @@
         const grid = $('#examplesGrid');
         if (!grid.classList.contains('open')) {
           grid.classList.add('open');
-          $('#examplesToggle').textContent = '📋 常见中式英文示例（已收录 50 条）▴';
+          $('#examplesToggle').textContent = '📋 常见中式英文示例（已收录 53 条）▴';
         }
+      }
+
+      function hydrateExampleCards() {
+        document.querySelectorAll('.example-group-btn').forEach(btn => {
+          const text = btn.dataset.text;
+          const result = lookupDemo(text);
+          const sceneLabel = SCENARIOS[btn.dataset.scene] || '通用';
+          const span = btn.querySelector('span');
+          const fallbackTag = span ? span.textContent.trim() : '';
+          const tags = EXAMPLE_TAGS[text] || (fallbackTag ? [fallbackTag] : []);
+          btn.innerHTML = `
+            <div class="example-card-original">${escapeHTML(text)}</div>
+            <div class="example-card-natural">${escapeHTML(result ? result.natural : '点击查看演示结果')}</div>
+            <div class="example-card-meta">
+              <span class="example-card-tag">${escapeHTML(sceneLabel)}</span>
+              ${tags.map(tag => `<span class="example-card-tag muted">${escapeHTML(tag)}</span>`).join('')}
+            </div>
+          `;
+        });
       }
 
       // ═══════════ NAVIGATION ═══════════
@@ -2751,7 +2605,7 @@
       $('#examplesToggle').addEventListener('click', () => {
         const grid = $('#examplesGrid');
         const open = grid.classList.toggle('open');
-        $('#examplesToggle').textContent = open ? '📋 常见中式英文示例（已收录 50 条）▴' : '📋 常见中式英文示例（已收录 50 条）▾';
+        $('#examplesToggle').textContent = open ? '📋 常见中式英文示例（已收录 53 条）▴' : '📋 常见中式英文示例（已收录 53 条）▾';
       });
 
       // Example search
@@ -2796,11 +2650,12 @@
             selectedScenario = btn.dataset.scene;
             updateScenarioUI();
           }
-          heroTextarea.focus();
-          heroTextarea.scrollIntoView({ behavior: 'smooth' });
-          showToast('已填入演示句子，点击开始纠错即可体验');
+          runFix();
         });
       });
+
+      hydrateExampleCards();
+      filterExamples();
 
       // Error lib filter
       elFilterBar.addEventListener('click', (e) => {
