@@ -1,25 +1,15 @@
-const fs = require('fs');
-
-const html = fs.readFileSync('index.html', 'utf8');
-const data = JSON.parse(fs.readFileSync('data_db.json', 'utf8'));
-
-function assert(condition, message) {
-  if (!condition) {
-    throw new Error(message);
-  }
-}
-
-const exampleCount = (html.match(/class="example-group-btn"/g) || []).length;
-
-assert(exampleCount === 53, `Expected 53 Chinglish examples, found ${exampleCount}`);
-assert(Array.isArray(data) && data.length === 5000, `Expected 5000 reference sentences, found ${data.length}`);
-assert(!/\/api\/(fix|test-key|key-status)/.test(html), 'Static demo must not call backend AI endpoints');
-assert(!/id="apiKeyInput"|id="apiKeyTestBtn"|USER_KEY_LS/.test(html), 'Static demo must not expose API Key UI');
-assert(html.includes('公开演示版仅支持内置示例'), 'Missing custom sentence static-demo warning');
-assert(html.includes("'copy-corrected'"), 'Missing copy corrected action');
-assert(html.includes("'copy-natural'"), 'Missing copy natural action');
-assert(html.includes("'copy-scenario'"), 'Missing copy scenario action');
-assert(html.includes("'copy-alternatives'"), 'Missing copy alternatives action');
-assert(html.includes('id="copyFullBtn"'), 'Missing copy full result action');
-
-console.log('Smoke test passed');
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const assert = require('node:assert/strict');
+const { execFileSync } = require('node:child_process');
+const root = __dirname;
+const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+const readme = fs.readFileSync(path.join(root, 'README.md'), 'utf8');
+assert(!/<script\b|<form\b|<input\b|data_db\.json|fetch\(|localStorage|example-group-btn/i.test(html));
+assert(html.includes('旧网页演示已停止维护') && html.includes('v3.2 Internal RC'));
+assert(readme.includes('免费 Mac Demo（计划）') && readme.includes('付费商业产品') && readme.includes('完整 Desktop 源代码保持 Private'));
+assert(!/href=["'][^"']*\.(?:dmg|zip)|href=["'][^"']*testflight/i.test(html));
+assert.equal(execFileSync('git', ['--no-optional-locks', '-C', root, 'ls-files', '--', 'data_db.json'], { encoding: 'utf8' }).trim(), '');
+assert(fs.readFileSync(path.join(root, '.gitignore'), 'utf8').split(/\r?\n/).includes('/data_db.json'));
+console.log('G1 neutral-notice / product-copy / index-exclusion checks PASS (6 assertions).');
